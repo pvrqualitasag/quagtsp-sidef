@@ -20,7 +20,7 @@
 #'
 #' ## Bash Settings
 #+ bash-env-setting, eval=FALSE
-set -o errexit    # exit immediately, if single command exits with non-zero status
+# set -o errexit    # exit immediately, if single command exits with non-zero status
 set -o nounset    # treat unset variables as errors
 set -o pipefail   # return value of pipeline is value of last command to exit with non-zero status
                   #  hence pipe fails if one command in pipe fails
