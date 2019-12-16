@@ -317,7 +317,8 @@ snppit_check () {
   if [ $? -eq 0 ]; then
       ok "snppit now seems to run ok"
   else
-      err_exit "There seems to be a problem running snppit"
+      error "There seems to be a problem running snppit"
+      exit 1
   fi
   
 }
@@ -404,7 +405,10 @@ log_msg "$SCRIPT" "Defined SNP_LIB: $SNP_LIB"
 #' link latest version to TheSNPpit_current:
 #+ link-latest
 log_msg "$SCRIPT" "Linking current version ..."
-ln -snf ${BASE_DIR}/TheSNPpit-$CURR_VERSION $SNP_HOME
+if [ ! -e "$SNP_HOME" ]
+then
+  ln -snf ${BASE_DIR}/TheSNPpit-$CURR_VERSION $SNP_HOME
+fi
 
 #' ### Binary
 #' create binary snppit:
