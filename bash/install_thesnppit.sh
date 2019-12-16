@@ -33,8 +33,11 @@ ECHO=/bin/echo                             # PATH to echo                       
 DATE=/bin/date                             # PATH to date                            #
 BASENAME=/usr/bin/basename                 # PATH to basename function               #
 DIRNAME=/usr/bin/dirname                   # PATH to dirname function                #
-PSQL=psql
-CREATEDB=createdb
+PGVERSION=10
+PSQL=/usr/lib/postgresql/$PGVERSION/bin/psql
+CREATEDB=/usr/lib/postgresql/$PGVERSION/bin/createdb
+PGCTL=/usr/lib/postgresql/$PGVERSION/bin/pg_ctl
+PGISREADY=/usr/lib/postgresql/10/bin/pg_isready
 
 
 #' ### Directories
@@ -61,6 +64,9 @@ OSUSER=zws
 DB_ENCODING=utf8
 DB_NAME=TheSNPpit
 
+SNPDATADIR=/home/zws/thesnppit/pgdata
+LOGDIR=/qualstorzws01/data_tmp/thesnppit/pglog
+LOGFILE=$LOGDIR/`date +"%Y%m%d%H%M%S"`_postgres.log
 LOCALBIN=/qualstorzws01/data_projekte/linuxBin
 
 #' ## Functions
@@ -275,6 +281,19 @@ get_pg_version () {
     echo allversion_:$PG_ALLVERSION
 }
 
+#' ### Check Status Of DB Server
+#' Verification whether the pg DB-server is running or not
+#+ pg-db-server-check-fun
+pg_server_running () {
+  $PGISREADY -h localhost
+  if [ $? -eq 0 ]
+  then
+    ok "PG db-server is running ..."
+  else
+    err_exit "PG database server not running"
+  fi
+}
+
 
 #' ### Perl Existence Check
 #' Verification whether perl exists on the system
@@ -288,6 +307,20 @@ check_perl () {
       info "Perl needs to be installed before continuing ..."
       exit 1
   fi
+}
+
+
+#' ### Snppit Binary Check
+#' Check whether snppit binary works
+#+ snppit-check-fun
+snppit_check () {
+  snppit --help >/dev/null
+  if [ $? -eq 0 ]; then
+      ok "snppit now seems to run ok"
+  else
+      err_exit "There seems to be a problem running snppit"
+  fi
+  
 }
 
 
@@ -396,11 +429,30 @@ if [ -n "$PG_PACKET" ]; then
 else
    err_exit "Cannot find operational db installation" 
 fi
+pg_server_running
 
 #' ### Perl Existence Check
 #' Call the function that verifies whether perl is installed
 #+ perl-check-call
 check_perl
+
+#' ### Check snppit binary
+#' let's see, if snppit runs
+#+ snppit-check-calla
+snppit_check
+
+
+# install TheSNPpit database:
+install_thesnppit_db
+
+# run basic tests:
+# info "===> Installation mainly done now. Running some basic tests now ..."
+# $SNP_HOME/bin/install_testdb
+# if [ $? -eq 0 ]; then
+#    ok "===> Basic tests ok. Installation of TheSNPpit complete"
+# else
+#    error "Basic tests failed."
+# fi
 
 
 #' ## End of Script

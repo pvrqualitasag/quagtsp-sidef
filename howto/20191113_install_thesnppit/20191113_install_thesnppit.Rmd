@@ -148,7 +148,7 @@ if [ ! -d "$SNPDATADIR" ]; then echo " * Create dir: $SNPDATADIR ...";mkdir -p $
 /usr/lib/postgresql/10/bin/initdb -D $SNPDATADIR -A trust -U zws
 ```
 
-Adjust the postgresql db server config
+The following adjust of the postgresql db server config is not done anymore. 
 
 ```
 cd $SNPDATADIR
@@ -166,7 +166,17 @@ if [ ! -d "$LOGDIR" ];then echo " * Create dir: $LOGDIR ...";mkdir -p $LOGDIR;fi
 /usr/lib/postgresql/10/bin/pg_ctl -D $SNPDATADIR -l $LOGFILE start
 ```
 
-This works. Now we stop and move the content of `SNPDATADIR`.
+This works. We can test whether the db-server runs with
+
+```
+/usr/lib/postgresql/10/bin/pg_isready -h localhost
+# localhost:5432 - accepting connections
+echo $?
+# 0
+```
+
+Now we stop and move the content of `SNPDATADIR`. 
+
 
 ```
 /usr/lib/postgresql/10/bin/pg_ctl -D $SNPDATADIR stop
@@ -352,6 +362,7 @@ SNPPITVERSION=$(cat $(ls -1 TheSNPpit-*/etc/VERSION))
 cd TheSNPpit-${SNPPITVERSION}/
 ```
 
+The script `bin/INSTALL` was modified to `install_thesnppit.sh` by excluding all steps that cannot be applied in our environment. Once this installation is done, we can try to connect `thesnppit` with the database.
 
 
 
