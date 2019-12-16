@@ -40,7 +40,8 @@
 # Eildert Groeneveld (eildert.groeneveld@gmx.de)
 ###########################################################################}}}
 
-SNP_HOME=${SNP_HOME-/usr/local/TheSNPpit_current}
+LOCALBIN=/qualstorzws01/data_projekte/linuxBin
+SNP_HOME=${SNP_HOME-$LOCALBIN/TheSNPpit_current}
 
 if [ ! -d "$SNP_HOME" ]; then
     echo "SNP_HOME is not set and/or $SNP_HOME is not your installation root"
