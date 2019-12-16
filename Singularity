@@ -11,7 +11,7 @@ MirrorURL: http://archive.ubuntu.com/ubuntu/
   apt-get update
 
   # Install system software for TheSNPpit
-  apt-get install -y gcc perl wget vim less screen curl locales time rsync gawk sudo tzdata git dos2unix sshpass htop
+  apt-get install -y gcc perl make wget vim less screen curl locales time rsync gawk tzdata git dos2unix sshpass htop
   apt-get install -y libdbd-pg-perl libecpg6 libecpg-dev libdbi-perl libinline-perl libmodern-perl-perl libcloog-ppl1 libcloog-ppl-dev libfile-slurp-perl libpq5 libjudy-dev
   apt-get update -y
   echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" >> /etc/apt/sources.list.d/pgdg.list
