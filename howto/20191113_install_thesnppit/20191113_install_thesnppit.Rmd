@@ -210,7 +210,7 @@ According to the startup message and according to the logfile, this seams to wor
 
 ### Installation and Configuration Cleanup
 
-* Move the unix socket from /var/run/postgresql to /home/zws/thesnppit/pgrun
+* This is no longer done: Move the unix socket from /var/run/postgresql to /home/zws/thesnppit/pgrun
 
 ```
 PGRUN=/home/zws/thesnppit/pgrun
@@ -277,7 +277,7 @@ LOGFILE=$LOGDIR/`date +"%Y%m%d%H%M%S"`_postgres.log
 /usr/lib/postgresql/10/bin/pg_ctl -D $SNPDATADIR -l $LOGFILE start
 ```
 
-* Move the unix socket from /home/zws/thesnppit/pgrun to /qualstorzws01/data_tmp/thesnppit/pgrun
+* This is no longer done: Move the unix socket from /home/zws/thesnppit/pgrun to /qualstorzws01/data_tmp/thesnppit/pgrun
 
 ```
 OLDPGRUN=/home/zws/thesnppit/pgrun
@@ -312,9 +312,9 @@ Try to get a connection using the client
 
 ```
 # the local user zws already exists, hence there is not need for the following command
-# /usr/lib/postgresql/10/bin/createuser -h localhost -p 5434 zws # throws an error and hence might not be necessary.
-/usr/lib/postgresql/10/bin/createdb -h localhost -p 5434 -O zws zws
-/usr/lib/postgresql/10/bin/psql -h localhost -p 5434
+# /usr/lib/postgresql/10/bin/createuser -h localhost zws # throws an error and hence might not be necessary.
+/usr/lib/postgresql/10/bin/createdb -h localhost -O zws zws
+/usr/lib/postgresql/10/bin/psql -h localhost 
 ```
 
 First, we were able to connect to the db-server using psql as stated above. The basic functionalities according to http://postgresguide.com/utilities/psql.html worked from the client. 
@@ -335,8 +335,25 @@ cd $TMPNASSNPDATADIR
 
 ```
 /usr/lib/postgresql/10/bin/pg_ctl -D $SNPDATADIR -l $LOGFILE start
-/usr/lib/postgresql/10/bin/createuser -h localhost -p 5434 --superuser snpadmin
+/usr/lib/postgresql/10/bin/createuser -h localhost -s postgres
+/usr/lib/postgresql/10/bin/createuser -h localhost --superuser snpadmin
 ```
+
+3. check whether DB was created
+
+```
+DB_NAME=TheSNPpit
+/usr/lib/postgresql/10/bin/psql -l --tuples-only --quiet --no-align --field-separator=' '
+/usr/lib/postgresql/10/bin/psql -l --tuples-only --quiet --no-align --field-separator=' ' | awk '{print $1}' | grep "^${DB_NAME}$"
+```
+
+4. drop the db
+
+```
+/usr/lib/postgresql/10/bin/dropdb $DB_NAME
+```
+
+
 
 ## Install TheSNPPit Software
 
