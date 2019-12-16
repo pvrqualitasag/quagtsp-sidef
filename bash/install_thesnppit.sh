@@ -33,10 +33,9 @@ ECHO=/bin/echo                             # PATH to echo                       
 DATE=/bin/date                             # PATH to date                            #
 BASENAME=/usr/bin/basename                 # PATH to basename function               #
 DIRNAME=/usr/bin/dirname                   # PATH to dirname function                #
-PGVERSION=10
-PSQL=/usr/lib/postgresql/$PGVERSION/bin/psql
-CREATEDB=/usr/lib/postgresql/$PGVERSION/bin/createdb
-PGCTL=/usr/lib/postgresql/$PGVERSION/bin/pg_ctl
+PSQL=/usr/lib/postgresql/10/bin/psql
+CREATEDB=/usr/lib/postgresql/10/bin/createdb
+PGCTL=/usr/lib/postgresql/10/bin/pg_ctl
 PGISREADY=/usr/lib/postgresql/10/bin/pg_isready
 
 
