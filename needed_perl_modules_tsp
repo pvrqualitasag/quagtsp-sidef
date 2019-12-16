@@ -1,0 +1,49 @@
+##############################################################################
+# $Id: needed_modules,v 1.7 2016/02/15 14:30:13 heli Exp $
+##############################################################################
+# Please install all modules in the following list
+# Comments and empty lines are allowed in this file.
+
+### Copyright #############################################################{{{
+# Copyright 2011-2016 Cong V.C. Truong, Helmut Lichtenberg, Eildert Groeneveld
+#
+# This file is part of the software package TheSNPpit.
+#
+# TheSNPpit is free software: you can redistribute it and/or modify it under the
+# terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 2 of the License, or (at your option) any later
+# version.
+#
+# TheSNPpit is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# TheSNPpit.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Authors: Cong V.C. Truong    (cong.chi@fli.bund.de) Helmut Lichtenberg
+# (helmut.lichtenberg@fli.bund.de) Eildert Groeneveld
+# (eildert.groeneveld@fli.bund.de)
+###########################################################################}}}
+
+[DEBUG]
+Data::Dumper
+Log::Log4perl
+Devel::Size
+Time::HiRes
+
+[SYSTEM]
+Getopt::Long
+Pod::Usage
+Perl6::Form
+List::MoreUtils
+Config::Std
+File::Basename
+File::Slurp
+Inline
+DBI
+DBD::Pg
+Modern::Perl
+
+# vim: foldenable:foldmethod=marker
