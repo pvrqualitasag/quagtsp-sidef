@@ -309,20 +309,6 @@ check_perl () {
 }
 
 
-#' ### Snppit Binary Check
-#' Check whether snppit binary works
-#+ snppit-check-fun
-snppit_check () {
-  snppit --help >/dev/null
-  if [ $? -eq 0 ]; then
-      ok "snppit now seems to run ok"
-  else
-      error "There seems to be a problem running snppit"
-      exit 1
-  fi
-  
-}
-
 
 #' ## Main Body of Script
 #' The main body of the script starts here.
@@ -442,7 +428,13 @@ check_perl
 #' ### Check snppit binary
 #' let's see, if snppit runs
 #+ snppit-check-calla
-snppit_check
+snppit --help >/dev/null
+if [ $? -eq 0 ]; then
+    ok "snppit now seems to run ok"
+else
+    error "There seems to be a problem running snppit"
+    exit 1
+fi
 
 
 # install TheSNPpit database:
