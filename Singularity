@@ -20,11 +20,18 @@ MirrorURL: http://archive.ubuntu.com/ubuntu/
   apt-get update -y
   apt clean
   
-  # Install additional perl-modules for TheSNPPit
+  # Install additional perl-modules for TSP
   curl -sSL "https://raw.githubusercontent.com/pvrqualitasag/quagtsp-sidef/master/etc/needed_perl_modules_tsp" > needed_perl_modules_tsp
   curl -sSL "https://raw.githubusercontent.com/pvrqualitasag/quagtsp-sidef/master/bash/install_perlmd_tsp.pl" > install_perlmd_tsp.pl
   perl -w install_perlmd_tsp.pl --install
   rm -rf install_perlmd_tsp.pl needed_perl_modules_tsp
+  
+  # Install TSP software
+  cd /usr/local
+  wget --no-check-certificate https://tsp-repo.thesnppit.net/download/TheSNPpit-latest.tar.gz
+  tar xzvf TheSNPpit-latest.tar.gz
+  cd TheSNPpit-1.1.4
+  
 
   # install OpenJDK 8 (LTS) from https://adoptopenjdk.net
   curl -sSL "https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u222-b10/OpenJDK8U-jdk_x64_linux_hotspot_8u222b10.tar.gz" > openjdk8.tar.gz

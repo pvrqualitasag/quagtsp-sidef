@@ -1,0 +1,15 @@
+---
+title: "Standalone Installation of TheSNPPit"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::knit_hooks$set(hook_convert_odg = rmdhelp::hook_convert_odg)
+```
+
+## Disclaimer
+Description of a stand-alone Installation of TheSNPPit (TSP). Stand-alone here means that all software programs are included in the container image and the database is stored in a location such that TSP can be run as non-root user `zws` from a container instance.
+
+
+## 
