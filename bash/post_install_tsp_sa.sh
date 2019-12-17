@@ -341,7 +341,7 @@ mv_data_item () {
   check_non_empty_dir_fail_create_non_exist $PGDATATRG
   # move all files in $PGDATADIR to
   log_msg mv_data_item " * Create list of items ..."
-  local l_pglist=()
+  l_pglist=()
   ls -1 $PGDATADIR | while read e;
   do
     log_msg mv_data_item "   + Add item $e to list ..."
@@ -350,7 +350,7 @@ mv_data_item () {
   cur_wd=`pwd`
   cd $PGDATADIR
   log_msg mv_data_item " * Move items from data dir to data trg ..."
-  for f in ${l_pglist[@]};
+  for f in "${l_pglist[@]}"";
   do
     log_msg mv_data_item "   + Moving item $f ..."    
     mv $f $PGDATATRG
