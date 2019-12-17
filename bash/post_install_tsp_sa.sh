@@ -135,10 +135,10 @@ check_non_empty_dir_fail_create_non_exist () {
   then
     if [ `ls -1 $l_check_dir | wc -l` -gt 0 ]
     then
-      err_exit "init_pg_server: Data directory exists and is non-empty ==> stop"
+      err_exit "check_non_empty_dir_fail_create_non_exist: Data directory $l_check_dir exists and is non-empty ==> stop"
     fi
   else
-    log_msg "init_pg_server" " * Create data directory: $l_check_dir"
+    log_msg "check_non_empty_dir_fail_create_non_exist" " * Create data directory: $l_check_dir"
     mkdir -p $l_check_dir
   fi
   
