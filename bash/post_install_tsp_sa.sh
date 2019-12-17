@@ -287,7 +287,7 @@ get_pg_version () {
     # need PG_VERSION     like 9
     # need PG_PACKET      like postgresql_11
     PG_PACKET=$(dpkg -l postgresql*    | egrep 'ii ' |egrep "SQL database, version" |awk '{print $2}')
-
+    PG_SUBVERSION=''
     if [ -n "$PG_PACKET"  ]; then
        if [[ $PG_PACKET = *9.* ]]; then
 # subv wird packet bei 10 11 etc
