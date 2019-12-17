@@ -16,7 +16,11 @@
 #' image.
 #'
 #' ## Description
-#' {Write a paragraph about how the problems are solved.}
+#' From the singularity container definition (scd) file, this script is downloaded 
+#' from the github-repository and stored in the extracted TSP-tarball. Then the 
+#' build job executes this script which links the downloaded TSP-version to 
+#' TheSNPpit_current and it creates an executable bash script which is stored in 
+#' /usr/local/bin.
 #'
 #' ## Bash Settings
 #+ bash-env-setting, eval=FALSE
