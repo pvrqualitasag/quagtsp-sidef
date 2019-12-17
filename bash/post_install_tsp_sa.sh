@@ -350,7 +350,7 @@ mv_data_item () {
   cur_wd=`pwd`
   cd $PGDATADIR
   log_msg mv_data_item " * Move items from data dir to data trg ..."
-  for f in "${l_pglist[@]}"";
+  for f in "${l_pglist[@]}";
   do
     log_msg mv_data_item "   + Moving item $f ..."    
     mv $f $PGDATATRG
