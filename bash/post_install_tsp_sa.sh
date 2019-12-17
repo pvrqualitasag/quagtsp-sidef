@@ -340,20 +340,25 @@ mv_data_item () {
   # check whether target data dir exists
   check_non_empty_dir_fail_create_non_exist $PGDATATRG
   # move all files in $PGDATADIR to
-  log_msg "mv_data_item" " * Create list of items ..."
+  log_msg mv_data_item " * Create list of items ..."
   local l_pglist=()
-  ls -1 $PGDATADIR | while read e
+  ls -1 $PGDATADIR | while read e;
   do
+    log_msg mv_data_item "   + Add item $e to list ..."
     l_pglist+=( $e )
   done
-  log_msg "mv_data_item" " * Move items from data dir to data trg ..."
-  for f in ${l_pglist[@]}
+  cur_wd=`pwd`
+  cd $PGDATADIR
+  log_msg mv_data_item " * Move items from data dir to data trg ..."
+  for f in ${l_pglist[@]};
   do
-    mv $PGDATADIR/$f $PGDATATRG
-    ln -s $PGDATATRG/$f $PGDATADIR/$f
+    log_msg mv_data_item "   + Moving item $f ..."    
+    mv $f $PGDATATRG
+    log_msg mv_data_item "   + Linking $PGDATATRG/$f to $f ..."    
+    ln -s $PGDATATRG/$f $f
     sleep 2;
   done
-  
+  cd $cur_wd
 }
 
 #' ### Check Status Of DB Server
