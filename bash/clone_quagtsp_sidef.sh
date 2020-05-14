@@ -113,7 +113,7 @@ clone_repo () {
 QHTZDIR=${QSRCDIR}/quagtsp_sidef; \
 if [ ! -d "$QSRCDIR" ]; then mkdir -p $QSRCDIR;fi; \
 if [ ! -d "$QHTZDIR" ]; then \
-  git -C "$QSRCDIR" clone https://github.com/pvrqualitasag/quagtsp_sidef.git -b "$REFERENCE"; \
+  git -C "$QSRCDIR" clone https://github.com/pvrqualitasag/quagtsp-sidef.git -b "$REFERENCE"; \
 else \
   echo "$QHTZDIR already exists, run updated_quagzws_htz.sh"; \
 fi'
@@ -122,7 +122,7 @@ fi'
 QHTZDIR=${QSRCDIR}/quagtsp_sidef; \
 if [ ! -d "$QSRCDIR" ]; then mkdir -p $QSRCDIR;fi; \
 if [ ! -d "$QHTZDIR" ]; then \
-  git -C "$QSRCDIR" clone https://github.com/pvrqualitasag/quagtsp_sidef.git; \
+  git -C "$QSRCDIR" clone https://github.com/pvrqualitasag/quagtsp-sidef.git; \
 else \
   echo "$QHTZDIR already exists, run updated_quagzws_htz.sh"; \
 fi'
@@ -145,13 +145,13 @@ local_clone_repo () {
   if [ "$REFERENCE" != "" ]
   then
     if [ ! -d "$QHTZDIR" ]; then
-      git -C "$QSRCDIR" clone https://github.com/pvrqualitasag/quagtsp_sidef.git -b "$REFERENCE"
+      git -C "$QSRCDIR" clone https://github.com/pvrqualitasag/quagtsp-sidef.git -b "$REFERENCE"
     else \
       echo "$QHTZDIR already exists, run updated_quagzws_htz.sh"
     fi
   else
     if [ ! -d "$QHTZDIR" ]; then
-      git -C "$QSRCDIR" clone https://github.com/pvrqualitasag/quagtsp_sidef.git
+      git -C "$QSRCDIR" clone https://github.com/pvrqualitasag/quagtsp-sidef.git
     else 
       echo "$QHTZDIR already exists, run updated_quagzws_htz.sh"
     fi
