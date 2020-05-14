@@ -110,11 +110,11 @@ pull_repo () {
   if [ "$REFERENCE" != "" ]
   then
     ssh $REMOTEUSER@$l_SERVER 'QSRCDIR=/home/quagadmin/simg; \
-QHTZDIR=${QSRCDIR}/quagtsp_sidef; \
+QHTZDIR=${QSRCDIR}/quagtsp-sidef; \
 git -C "$QSRCDIR" pull https://github.com/pvrqualitasag/quagtsp-sidef.git -b "$REFERENCE"'
   else
     ssh $REMOTEUSER@$l_SERVER 'QSRCDIR=/home/quagadmin/simg; \
-QHTZDIR=${QSRCDIR}/quagtsp_sidef; \
+QHTZDIR=${QSRCDIR}/quagtsp-sidef; \
 git -C "$QSRCDIR" pull https://github.com/pvrqualitasag/quagtsp-sidef.git'
   fi
 }
@@ -128,7 +128,7 @@ git -C "$QSRCDIR" pull https://github.com/pvrqualitasag/quagtsp-sidef.git'
 local_pull_repo () {
   log_msg 'local_pull_repo' "Running update on $SERVER"
   QSRCDIR=/home/quagadmin/simg
-  QHTZDIR=${QSRCDIR}/quagtsp_sidef
+  QHTZDIR=${QSRCDIR}/quagtsp-sidef
 
   # check whether we are inside of a singularity container
   if [ "$REFERENCE" != "" ]
