@@ -1,0 +1,14 @@
+### # local definition of aliases
+### # singularity shell, if container image file exists
+QGSIMG={SIMGLINK}
+if [ -f "$QGSIMG" ]
+then
+  alias ssbp='singularity shell --bind {BINDPATH} "$QGSIMG"'
+  alias siszws='singularity instance start --bind {BINDPATH} "$QGSIMG" sizws'
+  alias sszws='SINGULARITY_SHELL=/bin/bash singularity shell instance://sizws'
+fi
+alias sils='singularity instance list'
+alias sisa='singularity instance start'
+alias sisab='singularity instance start --bind {BINDPATH}'
+alias siso='singularity instance stop'
+alias sish='singularity shell'
