@@ -132,11 +132,11 @@ fi
 ### # create the image file
 SIMGFN=`date +"%Y%m%d%H%M%S"`_quagtsp_ubuntu1804lts.img
 log_msg $SCRIPT " * Creating image file: $SIMGFN ..."
-sudo singularity image.create --size 1024 $SIMGFN
+singularity image.create --size 1024 $SIMGFN
 
 ### # start installation
 log_msg $SCRIPT " * Installing based on definition: $SIMGDEF ..."
-sudo singularity build $SIMGFN $SIMGDEF &> `date +"%Y%m%d%H%M%S"`_quagtsp_ubuntu1804lts_build.log
+singularity build $SIMGFN $SIMGDEF &> `date +"%Y%m%d%H%M%S"`_quagtsp_ubuntu1804lts_build.log
 
 ### # change back to original directory
 cd $CURRWD
