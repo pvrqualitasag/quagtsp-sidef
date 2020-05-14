@@ -4,20 +4,22 @@ MirrorURL: http://archive.ubuntu.com/ubuntu/
 
 %post
   sed -i 's/main/main restricted universe/g' /etc/apt/sources.list
-  apt-get update
+  apt update
 
   # install software properties commons for add-apt-repository
-  apt-get install -y software-properties-common apt-utils
-  apt-get update
+  apt install -y software-properties-common apt-utils
+  apt update
+  apt upgrade -y
 
   # Install system software for TheSNPpit
-  apt-get install -y gcc perl make wget vim less screen curl locales time rsync gawk tzdata git dos2unix sshpass htop
-  apt-get install -y libdbd-pg-perl libecpg6 libecpg-dev libdbi-perl libinline-perl libmodern-perl-perl libcloog-ppl1 libcloog-ppl-dev libfile-slurp-perl libpq5 libjudy-dev
-  apt-get update -y
+  apt install -y gcc perl make wget vim less screen curl locales time rsync gawk tzdata git dos2unix sshpass htop
+  apt install -y libdbd-pg-perl libecpg6 libecpg-dev libdbi-perl libinline-perl libmodern-perl-perl libcloog-ppl1 libcloog-ppl-dev libfile-slurp-perl libpq5 libjudy-dev
+  apt update -y
   echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" >> /etc/apt/sources.list.d/pgdg.list
   wget -q https://www.postgresql.org/media/keys/ACCC4CF8.asc -O - | apt-key add -
-  apt-get install -y postgresql postgresql-contrib
-  apt-get update -y
+  apt install -y postgresql postgresql-contrib
+  apt update -y
+  apt upgrade -y
   apt clean
   
   # Install additional perl-modules for TheSNPPit

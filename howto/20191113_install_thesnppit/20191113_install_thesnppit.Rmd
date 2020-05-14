@@ -9,7 +9,7 @@ knitr::knit_hooks$set(hook_convert_odg = rmdhelp::hook_convert_odg)
 ```
 
 ## Requirements and Problems
-From the documenatation given in the user [guide]https://tsp-repo.thesnppit.net/resources/TheSNPpit-user-guide-latest.pdf), it is clear that TheSNPpit as it comes out of the box is a program that is targetted towards running on a single machine. This means that there is one instance of the database-server and one installation of the client programs that accesses the data in the database. Different users on the same machine can use the client programs which can all interact with the given instance of the database on the same machine.
+From the documenatation given in the user [guide](https://tsp-repo.thesnppit.net/resources/TheSNPpit-user-guide-latest.pdf), it is clear that TheSNPpit (TSP), as it comes out of the box, is a program that is targetted towards running on a single machine and is not constructed for a distributed setup. This means that there is one instance of the database-server and one installation of the client programs that accesses the data in the database. Different users on the same machine can use the client programs which can all interact with the given instance of the database on the same machine.
 
 ```{r base-installation-thesnppit, echo=FALSE, hook_convert_odg=TRUE, fig_path="odg"}
 #rmdhelp::use_odg_graphic(ps_path = "odg/base-installation-thesnppit.odg")
@@ -25,18 +25,31 @@ knitr::include_graphics(path = "odg/distributed-installation-thesnppit.png")
 ```
 
 
-A further requirement for using the provided installation infrastructure is that root access is available on the machine where TheSNPPit is to be installed. 
+A further requirement for using the provided installation infrastructure is that root access is available on the machine where TSP is to be installed. In most High-Performance-Computing (HPC) environments, this requirement is not met. On an HPC-machine every user has a login account with restricted permissions. For the zws-servers at Qualitas AG, all users access the servers via the common account `zws` which does not have root-priviledges. Hence, with respect to the installation of TSP, we are in an HPC-scenario.
 
-As a consequence of the points described above, the automatic installation script given in the tarball from TheSNPpit cannot be used. 
+As a consequence of the above described points, the automatic installation script given in the tarball from TSP cannot be used. In what follows, strategies for solving the above mentioned problems are developed and described.
 
 
 ## Strategy
-The problems described in the previous section are to be solved in different steps. 
+Different strategies to solve the above described problems can be envisaged. The different strategies are characterized by different levels of complexity and offer different functionalities. In summary the following strategies can be layed out.
 
-1. Installation of TheSNPpit on a single ZWS-machine given the restrictions of not having root access to the machine and only having a single user `zws`. The single machine installation requires to do all steps given in the installation section of the user guide separately. 
-2. Try to expand the clients to be able to be used on different machines. The distributed usage of TheSNPpit includes the installation of the database server on one machine and the client part of the package on all machines where TheSNPpit should be used. All the clients must be able to connect to the single instance of the database server. Alternatively it would also be possible to setup a master-slave replication scheme between the machines where one machine has the database master and all the others run replication slave databases. But so far, this seams to be too complicated compared to the benefits that would result from this setup. 
+1. Simple one machine installation of TSP. This solution has a low level of complexity, but it does offer the functionality of using TSP software from only one machine.
+2. Distributed setup where TSP client software can be used from different machines. This solution corresponds to a distributed setup which is more complex but it does offer the functionality of using TSP software from different machines.
+
+In a first step, the TSP system is installed following strategy 1. That means, the complete system is installed on a single machine. Together with the container based context of the zws-servers, the installation is done in a separate container image.
+
+In what follows the manual installation procedure described in the guide of TSP is followed to produce a single-machine installation in a container image.
 
 
+## Installation
+### User Guide
+The installation of TSP is described in Chapter 6 of the guide available at https://tsp-repo.thesnppit.net/resources/TheSNPpit-user-guide-latest.pdf. The general installation procedure consists of downloading and unpacking the tar-ball into the directory `/usr/local/TheSNPpit_current`. TSP is installed via the script `bin/install`. This installation requires root priviledges and hence cannot be used in an HPC-environment.
+
+### Manual Installation
+In section 6.3 of the user guide a manual procedure is described. In Listing 57, the software dependencies of TSP are described. 
+
+
+# Old Stuff Below
 ## Installation Resources
 ### User Guide
 We are currently checking the user guide on https://tsp-repo.thesnppit.net/resources/TheSNPpit-user-guide-latest.pdf for hints on how to install. Chapter 6 of the user guide describes the installation. The proposed way to install TheSNPpit is to download the tar-ball from the website, to unpack the tarball and to run the script `bin/install`. Since this requires root priviledges, this cannot be used in a singularity container.
