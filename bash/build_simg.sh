@@ -112,8 +112,9 @@ fi
 ### # check whether working directory exists
 if [ ! -d "$SWORKDIR" ]
 then
-  log_msg $SCRIPT " * ERROR: Cannot find working directory: $SWORKDIR"
-  exit 1
+  log_msg $SCRIPT " * Cannot find working directory: $SWORKDIR - create it"
+  mkdir -p $SWORKDIR
+  chown quagadmin:quagadmin $SWORKDIR
 fi
 
 ### # change to work directory
