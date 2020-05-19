@@ -58,6 +58,10 @@ SERVER=`hostname`                          # put hostname of server in variable 
 # BASE_DIR=/usr/local
 CURR_VERSION=$(cat etc/VERSION)
 LOCALBIN=/usr/local/bin
+ADMINUSER=zws
+ADMINGROUP=zws
+DB_ENCODING=utf8
+DB_NAME=TheSNPpit
 
 #' ## Functions
 #' The following definitions of general purpose functions are local to this script.
@@ -195,6 +199,36 @@ EndOfSNPpitsh
   
 }
 
+#' ### Set Permissions
+#' Permissions of directories for TSP are set. These permissions are adapted 
+#' from the original installation script.
+#+ set-permission-fun
+set_permission () {
+  find -L ${SNP_HOME}/ -type d -print0 |xargs -0 chmod 750
+  find -L ${SNP_HOME}/ -type f -print0 |xargs -0 chmod 640
+  chmod 750 ${SNP_HOME}/bin/*
+  chmod 750 ${SNP_HOME}/contrib/bin/*
+  mkdir -p ${SNP_HOME}/regression/tmp
+  chmod 770 ${SNP_HOME}/regression/tmp
+  chown -R -L ${ADMINUSER}:$ADMINGROUP $SNP_HOME
+  chown ${ADMINUSER}:$ADMINGROUP /usr/local/bin/snppit
+  chmod 750 /usr/local/bin/snppit
+}
+
+#' ### Checking Installation of Perl
+#' Check whether perl is installed.
+#+ check-perl-fun
+check_perl () {
+  perl -v >/dev/null
+  if [ $? -eq 0 ]; then
+    ok "Perl already installed"
+  else
+    error "Perl is not installed!"
+    info "Installing Perl with dependencies ..."
+    apt-get --yes install perl
+  fi
+}
+
 
 #' ## Main Body of Script
 #' The main body of the script starts here.
@@ -232,6 +266,17 @@ fi
 #+ call-create-bin
 log_msg "$SCRIPT" "Create binary ..."
 create_binary_snppit
+
+#' ### Setting Permissions
+#' Permissions of TSP dirs and files are set
+#+ set-permission
+log_msg "$SCRIPT" "Set permissions ..."
+set_permission
+
+#' ### Check Perl
+#' Check whether perl is installed
+log_msg "$SCRIPT" "Check perl ..."
+check_perl
 
 
 #' ## End of Script

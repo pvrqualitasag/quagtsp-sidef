@@ -12,4 +12,19 @@ knitr::knit_hooks$set(hook_convert_odg = rmdhelp::hook_convert_odg)
 Description of a stand-alone Installation of TheSNPPit (TSP). Stand-alone here means that all software programs are included in the container image and the database is stored in a location such that TSP can be run as non-root user `zws` from a container instance.
 
 
-## 
+## TSP Installation
+According to the user guide manual (https://tsp-repo.thesnppit.net/resources/TheSNPpit-user-guide-latest.pdf) installation consists of the following steps. 
+
+1. system software installation
+2. database configuration
+3. TheSNPpit software installation
+4. testing
+
+
+## System Software Installation
+The system software is installed during the installation of the singularity container image.
+
+
+## Database Configuration
+
+
