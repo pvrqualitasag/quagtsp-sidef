@@ -108,27 +108,28 @@ clone_repo () {
   local l_SERVER=$1
   
   log_msg 'clone_repo' " ** Running update on $l_SERVER"
-  if [ "$REFERENCE" != "" ]
+  if [ "$REFERENCE" == "tsp-sa" ]
   then
     log_msg 'clone_repo' " ** Cloning branch $REFERENCE ..."
-    ssh $REMOTEUSER@$l_SERVER "export QSRCDIR=/home/quagadmin/simg; \
-export QHTZDIR=${QSRCDIR}/quagtsp_sidef; \
-if [ ! -d $QSRCDIR ]; then mkdir -p $QSRCDIR;fi; \
-if [ ! -d $QHTZDIR ]; then \
-  git -C $QSRCDIR clone https://github.com/pvrqualitasag/quagtsp-sidef.git -b $REFERENCE; \
+    ssh $REMOTEUSER@$l_SERVER 'QSRCDIR=/home/quagadmin/simg; \
+QHTZDIR=${QSRCDIR}/quagtsp-sidef; \
+if [ ! -d "$QSRCDIR" ]; then mkdir -p $QSRCDIR;fi; \
+if [ ! -d "$QHTZDIR" ]; then \
+  git -C "$QSRCDIR" clone https://github.com/pvrqualitasag/quagtsp-sidef.git -b tsp-sa; \
 else \
-  echo $QHTZDIR already exists, run updated_quagzws_htz.sh; \
-fi"
+  echo "$QHTZDIR already exists, run updated_quagzws_htz.sh"; \
+fi'
   else
     log_msg 'clone_repo' " ** Cloning master ..."
-    ssh $REMOTEUSER@$l_SERVER "QSRCDIR=/home/quagadmin/simg; \
-QHTZDIR=${QSRCDIR}/quagtsp_sidef; \
-if [ ! -d \"$QSRCDIR\" ]; then mkdir -p $QSRCDIR;fi; \
-if [ ! -d \"$QHTZDIR\" ]; then \
-  git -C $QSRCDIR clone https://github.com/pvrqualitasag/quagtsp-sidef.git; \
+    ssh $REMOTEUSER@$l_SERVER 'QSRCDIR=/home/quagadmin/simg; \
+QHTZDIR="$QSRCDIR"/quagtsp-sidef; \
+echo "QHTZDIR is $QHTZDIR ..."; \
+if [ ! -d "$QSRCDIR" ]; then mkdir -p $QSRCDIR;fi; \
+if [ ! -d "$QHTZDIR" ]; then \
+  git -C "$QSRCDIR" clone https://github.com/pvrqualitasag/quagtsp-sidef.git; \
 else \
-  echo $QHTZDIR already exists, run updated_quagzws_htz.sh; \
-fi"
+  echo "$QHTZDIR already exists, run updated_quagzws_htz.sh"; \
+fi'
   fi
 }
 
