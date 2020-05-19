@@ -114,7 +114,7 @@ clone_repo () {
     log_msg 'clone_repo' " ** Cloning branch $REFERENCE ..."
     ssh $REMOTEUSER@$l_SERVER "QSRCDIR=/home/quagadmin/simg; \
 QHTZDIR=${QSRCDIR}/quagtsp_sidef; \
-if [ ! -d \"$QSRCDIR\" ]; then mkdir -p $QSRCDIR;fi; \
+if [ ! -d \"$QSRCDIR\" ]; then mkdir -p \"$QSRCDIR\";fi; \
 if [ ! -d \"$QHTZDIR\" ]; then \
   git -C $QSRCDIR clone https://github.com/pvrqualitasag/quagtsp-sidef.git -b $REFERENCE; \
 else \
