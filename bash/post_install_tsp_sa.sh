@@ -44,14 +44,6 @@ INSTALLDIR=`$DIRNAME ${BASH_SOURCE[0]}`    # installation dir of bashtools on ho
 SCRIPT=`$BASENAME ${BASH_SOURCE[0]}`       # Set Script Name variable                #
 SERVER=`hostname`                          # put hostname of server in variable      #
 
-#' ### Postgresql Programs
-#' Explicit definitions of pg programs
-#+ pg-prog-def
-INITDB=/usr/lib/postgresql/10/bin/initdb
-PSQL=/usr/lib/postgresql/10/bin/psql
-CREATEDB=/usr/lib/postgresql/10/bin/createdb
-PGCTL=/usr/lib/postgresql/10/bin/pg_ctl
-PGISREADY=/usr/lib/postgresql/10/bin/pg_isready
 
 #' ### Configure start
 #' The items that cannot be used are commented out. 
@@ -306,20 +298,6 @@ get_pg_version () {
     echo allversion_:$PG_ALLVERSION
 }
 
-#' ### Check PG Version Requirement
-#' The pg database package must be newer than a given version
-#+ check-pg-version-fun
-check_pg_version () {
-  if [ -n "$PG_PACKET" ]; then
-     if [ ${PG_VERSION} -eq 9 ] && [ ${PG_SUBVERSION} -le 3 ] ; then
-         error "you need to have postgresql version > 9.3, sorry"
-     fi
-     ok "operational version of postgresql installed:" $PG_PACKET
-  else
-     err_exit "Cannot find operational db installation" 
-  fi
-  
-}
 
 #' ### Initialisation of the PG db-server
 #' All initialisation steps are done in this function
@@ -374,20 +352,81 @@ pg_server_running () {
   fi
 }
 
-
-#' ### Perl Existence Check
-#' Verification whether perl exists on the system
-#+ perl-check-fun
-check_perl () {
-  perl -v >/dev/null
-  if [ $? -eq 0 ]; then
-      ok "Perl already installed"
-  else
-      error "Perl is not installed!"
-      info "Perl needs to be installed before continuing ..."
-      exit 1
-  fi
+#' ### Access To DB
+#' Check wheter we can access the database
+#+ has-pg-access-fun
+has_pg_access () {
+    psql -l >/dev/null 2>&1
+    return $?
 }
+
+#' ### Check HBA Config
+#' Check configuration in pag_hba.conf
+#+ check-hba-conf-fun
+check_hba_conf () {
+    # save old pg_hba.conf and prepend a line:
+    grep -q "^host  *all  *snpadmin .*trust$" $ETC_DIR/pg_hba.conf >/dev/null
+    if [ $? -eq 0 ]; then
+        ok "$ETC_DIR/pg_hba.conf already configured"
+    else
+        NOW=$(date +"%Y-%m-%d_%H:%M:%S")
+        mv $ETC_DIR/pg_hba.conf $ETC_DIR/pg_hba.conf-saved-$NOW
+        echo "# next line added by TheSNPpit installation routine ($NOW)" >$ETC_DIR/pg_hba.conf
+        echo "# only these two lines are required, that standard configuration"
+        echo "# as usually (2019) can be found the end can stay as is"
+        # IPV4:
+        echo "host  all   snpadmin   127.0.0.1/32   trust" >>$ETC_DIR/pg_hba.conf
+        # IPV6:
+        echo "host  all   snpadmin   ::1/128        trust" >>$ETC_DIR/pg_hba.conf
+        cat $ETC_DIR/pg_hba.conf-saved-$NOW >>$ETC_DIR/pg_hba.conf
+        info "Note: $ETC_DIR/pg_hba.conf saved to $ETC_DIR/pg_hba.conf-saved-$NOW and adapted"
+        su -s /bin/bash -c "$PG_CTL -D $DATA_DIR reload" postgres >/dev/null
+    fi
+}
+
+#' ### Configure PG Database
+#' Configuration of pg database
+#+ config-pg-fun
+configure_postgresql () {
+    # create snpadmin with superuser privilege
+    # info "Running configure_postgresql ..."
+    # as of version 10 no subversion: postgresql-10: use the 10
+    # VERSION is now version.subversion as used in ETC_DIR
+    PG_CTL="/usr/lib/postgresql/${PG_ALLVERSION}/bin/pg_ctl"
+    ETC_DIR="/etc/postgresql/${PG_ALLVERSION}/main"
+    if [ ! -d $ETC_DIR ]; then
+        err_exit "ETC_DIR $ETC_DIR doesn't exist"
+    fi
+
+    has_pg_access
+    if [ $? -ne 0 ]; then
+        error "You have no right to access postgresql, wait ..."
+        # get_pg_access_for_root
+        # if [ $? -ne 0 ]; then
+        #     err_exit "Can't create root a postgresql superuser"
+        # fi
+        # ok "Access rights to root granted"
+    fi
+
+    DATA_DIR=$(echo "show data_directory" |su -l -s /bin/bash -c "psql --tuples-only --quiet --no-align" postgres)
+    if [ ! -d $DATA_DIR ]; then
+        err_exit "DATA_DIR $DATA_DIR doesn't exist"
+    fi
+
+    echo "select usename from pg_user where usename = '$ADMINUSER'" |psql postgres --tuples-only --quiet --no-align |gre
+p -q $ADMINUSER >/dev/null
+    if [ $? -eq 0 ]; then
+        ok "PostgreSQL ADMINUSER $ADMINUSER exists"
+    else
+        su -l -s /bin/bash -c "createuser --superuser $ADMINUSER" postgres
+        su -s /bin/bash -c "$PG_CTL -D $DATA_DIR reload" postgres >/dev/null
+        ok "PostgreSQL ADMINUSER $ADMINUSER created"
+    fi
+
+    # save old pg_hba.conf and prepend a line:
+    check_hba_conf
+}
+
 
 
 
@@ -396,25 +435,26 @@ check_perl () {
 #+ start-msg, eval=FALSE
 start_msg
 
-
-#' ## Main Part Of Installation
-#' The main steps of the installation start here.
-
-
-#' ### Checks related to PG
-#' The first check verifies whether multiple instances of pg are installed.
-#' The second function determines the version of the installed pg
-#+ pg-check-call
-log_msg "$SCRIPT" "Checking for postgres db installation ..."
-multiple_pg_installations
+#' ### Determine Version of PG
+#' The version of pg is determined
+#+ get-pg-version
 get_pg_version
 
-#' operational version installed? if PG_PACKET set: may be more than 1!!
-#+ check-pg-version-call
-check_pg_version
+#' ### Postgresql Programs
+#' Explicit definitions of pg programs depending on pg version
+#+ pg-prog-def
+INITDB="/usr/lib/postgresql/$PG_ALLVERSION/bin/initdb"
+PSQL="/usr/lib/postgresql/$PG_ALLVERSION/bin/psql"
+CREATEDB="/usr/lib/postgresql/$PG_ALLVERSION/bin/createdb"
+PGCTL="/usr/lib/postgresql/$PG_ALLVERSION/bin/pg_ctl"
+PGISREADY="/usr/lib/postgresql/$PG_ALLVERSION/bin/pg_isready"
 
-#' initialisation of the pg db-server
+
+#' ### Configruation of PG
+#' The configuration steps of the pg database that require to be run as 
+#' user zws with its home directory available are done from here on.
 #+ init-pg-server-call
+log_msg "$SCRIPT" "Initialise the postgres db instance ..."
 init_pg_server
 
 #' move data items from data directory to data target
@@ -424,8 +464,14 @@ then
   mv_data_item
 fi
 
+#' ### Configure PG
+#' Configurationf of pg database
+#+ configure-pg
+configure_postgresql
+
+
 #' check whether the pg db-server is running
-# pg_server_running
+pg_server_running
 
 #' ### Perl Existence Check
 #' Call the function that verifies whether perl is installed
