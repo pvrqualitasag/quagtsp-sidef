@@ -197,6 +197,13 @@ EndOfSNPpitsh
   # adjust permissions
   chmod 755 $LOCALBIN/snppit
   
+  # create var subdirectory
+  VAR_DIR=$SNP_HOME/var
+  if [ ! -d "$VAR_DIR" ];then
+    mkdir -p $VAR_DIR
+    chmod 777 $VAR_DIR
+  fi
+  
 }
 
 #' ### Set Permissions
@@ -291,6 +298,81 @@ check_pg_version () {
   
 }
 
+#' ### Access To DB
+#' Check wheter we can access the database
+#+ has-pg-access-fun
+has_pg_access () {
+    psql -l >/dev/null 2>&1
+    return $?
+}
+
+#' ### Check HBA Config
+#' Check configuration in pag_hba.conf
+#+ check-hba-conf-fun
+check_hba_conf () {
+    # save old pg_hba.conf and prepend a line:
+    grep -q "^host  *all  *snpadmin .*trust$" $ETC_DIR/pg_hba.conf >/dev/null
+    if [ $? -eq 0 ]; then
+        ok "$ETC_DIR/pg_hba.conf already configured"
+    else
+        NOW=$(date +"%Y-%m-%d_%H:%M:%S")
+        mv $ETC_DIR/pg_hba.conf $ETC_DIR/pg_hba.conf-saved-$NOW
+        echo "# next line added by TheSNPpit installation routine ($NOW)" >$ETC_DIR/pg_hba.conf
+        echo "# only these two lines are required, that standard configuration"
+        echo "# as usually (2019) can be found the end can stay as is"
+        # IPV4:
+        echo "host  all   snpadmin   127.0.0.1/32   trust" >>$ETC_DIR/pg_hba.conf
+        # IPV6:
+        echo "host  all   snpadmin   ::1/128        trust" >>$ETC_DIR/pg_hba.conf
+        cat $ETC_DIR/pg_hba.conf-saved-$NOW >>$ETC_DIR/pg_hba.conf
+        info "Note: $ETC_DIR/pg_hba.conf saved to $ETC_DIR/pg_hba.conf-saved-$NOW and adapted"
+        su -s /bin/bash -c "$PG_CTL -D $DATA_DIR reload" postgres >/dev/null
+    fi
+}
+
+#' ### Configure PG Database
+#' Configuration of pg database
+#+ config-pg-fun
+configure_postgresql () {
+    # create snpadmin with superuser privilege
+    # info "Running configure_postgresql ..."
+    # as of version 10 no subversion: postgresql-10: use the 10
+    # VERSION is now version.subversion as used in ETC_DIR
+    PG_CTL="/usr/lib/postgresql/${PG_ALLVERSION}/bin/pg_ctl"
+    ETC_DIR="/etc/postgresql/${PG_ALLVERSION}/main"
+    if [ ! -d $ETC_DIR ]; then
+        err_exit "ETC_DIR $ETC_DIR doesn't exist"
+    fi
+
+    has_pg_access
+    if [ $? -ne 0 ]; then
+        error "You have no right to access postgresql, wait ..."
+        # get_pg_access_for_root
+        # if [ $? -ne 0 ]; then
+        #     err_exit "Can't create root a postgresql superuser"
+        # fi
+        # ok "Access rights to root granted"
+    fi
+
+    DATA_DIR=$(echo "show data_directory" |su -l -s /bin/bash -c "psql --tuples-only --quiet --no-align" postgres)
+    if [ ! -d $DATA_DIR ]; then
+        err_exit "DATA_DIR $DATA_DIR doesn't exist"
+    fi
+
+    echo "select usename from pg_user where usename = '$ADMINUSER'" |psql postgres --tuples-only --quiet --no-align |gre
+p -q $ADMINUSER >/dev/null
+    if [ $? -eq 0 ]; then
+        ok "PostgreSQL ADMINUSER $ADMINUSER exists"
+    else
+        su -l -s /bin/bash -c "createuser --superuser $ADMINUSER" postgres
+        su -s /bin/bash -c "$PG_CTL -D $DATA_DIR reload" postgres >/dev/null
+        ok "PostgreSQL ADMINUSER $ADMINUSER created"
+    fi
+
+    # save old pg_hba.conf and prepend a line:
+    check_hba_conf
+}
+
 
 #' ## Main Body of Script
 #' The main body of the script starts here.
@@ -356,6 +438,10 @@ get_pg_version
 #+ check-pg-version
 check_pg_version
 
+#' ### Configure PG
+#' Configurationf of pg database
+#+ configure-pg
+configure_postgresql
 
 
 #' ## End of Script

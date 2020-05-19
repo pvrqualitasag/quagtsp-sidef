@@ -30,6 +30,7 @@ MirrorURL: http://archive.ubuntu.com/ubuntu/
   cd /usr/local
   wget --no-check-certificate https://tsp-repo.thesnppit.net/download/TheSNPpit-latest.tar.gz
   tar xzvf TheSNPpit-latest.tar.gz
+  rm TheSNPpit-latest.tar.gz
   cd TheSNPpit-1.1.4
   curl -sSL "https://raw.githubusercontent.com/pvrqualitasag/quagtsp-sidef/tsp-sa/bash/install_tsp_sa.sh" > bin/install_tsp_sa.sh
   chmod 755 bin/install_tsp_sa.sh
