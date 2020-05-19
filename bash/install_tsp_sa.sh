@@ -209,9 +209,9 @@ set_permission () {
   chmod 755 ${SNP_HOME}/bin/*
   chmod 755 ${SNP_HOME}/contrib/bin/*
   mkdir -p ${SNP_HOME}/regression/tmp
-  chmod 775 ${SNP_HOME}/regression/tmp
-  chown -R -L ${ADMINUSER}:$ADMINGROUP $SNP_HOME
-  chown ${ADMINUSER}:$ADMINGROUP /usr/local/bin/snppit
+  chmod 777 ${SNP_HOME}/regression/tmp
+  # chown -R -L ${ADMINUSER}:$ADMINGROUP $SNP_HOME
+  # chown ${ADMINUSER}:$ADMINGROUP /usr/local/bin/snppit
   chmod 755 /usr/local/bin/snppit
 }
 
