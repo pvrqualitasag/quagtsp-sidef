@@ -112,7 +112,7 @@ pull_repo () {
     SSHCMD="QTSPDIR=$REPOPATH;"'
 git -C "$QTSPDIR" pull https://github.com/pvrqualitasag/quagtsp-sidef.git -b '"$REFERENCE"
   else
-    SSHCMD="QTSPDIR=$REPOPATH;"'; \
+    SSHCMD="QTSPDIR=$REPOPATH;"' \
 git -C "$QTSPDIR" pull https://github.com/pvrqualitasag/quagtsp-sidef.git'
   fi
   log_msg 'pull_repo' " ** SSHCMD: $SSHCMD"
