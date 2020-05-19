@@ -106,9 +106,10 @@ log_msg () {
 #+ update-pkg-fun
 clone_repo () {
   local l_SERVER=$1
-  log_msg 'clone_repo' "Running update on $l_SERVER"
+  log_msg 'clone_repo' " ** Running update on $l_SERVER"
   if [ "$REFERENCE" != "" ]
   then
+    log_msg 'clone_repo' " ** Cloning branch $REFERENCE ..."
     ssh $REMOTEUSER@$l_SERVER 'QSRCDIR=/home/quagadmin/simg; \
 QHTZDIR=${QSRCDIR}/quagtsp_sidef; \
 if [ ! -d "$QSRCDIR" ]; then mkdir -p $QSRCDIR;fi; \
@@ -118,6 +119,7 @@ else \
   echo "$QHTZDIR already exists, run updated_quagzws_htz.sh"; \
 fi'
   else
+    log_msg 'clone_repo' " ** Cloning master ..."
     ssh $REMOTEUSER@$l_SERVER 'QSRCDIR=/home/quagadmin/simg; \
 QHTZDIR=${QSRCDIR}/quagtsp_sidef; \
 if [ ! -d "$QSRCDIR" ]; then mkdir -p $QSRCDIR;fi; \
