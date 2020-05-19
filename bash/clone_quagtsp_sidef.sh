@@ -106,6 +106,8 @@ log_msg () {
 #+ update-pkg-fun
 clone_repo () {
   local l_SERVER=$1
+  local QSRCDIR=""
+  local QHTZDIR=""
   log_msg 'clone_repo' " ** Running update on $l_SERVER"
   if [ "$REFERENCE" != "" ]
   then
