@@ -109,8 +109,9 @@ pull_repo () {
   log_msg 'pull_repo' " ** Running update on $l_SERVER"
   if [ "$REFERENCE" != "" ]
   then
-    SSHCMD="QTSPDIR=$REPOPATH;"'
-git -C "$QTSPDIR" pull https://github.com/pvrqualitasag/quagtsp-sidef.git -b '"$REFERENCE"
+    SSHCMD="cd $REPOPATH;"'
+git fetch;    
+git checkout origin/'"$REFERENCE"
   else
     SSHCMD="QTSPDIR=$REPOPATH;"' \
 git -C "$QTSPDIR" pull https://github.com/pvrqualitasag/quagtsp-sidef.git'
