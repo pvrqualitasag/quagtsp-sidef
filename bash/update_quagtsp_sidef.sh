@@ -181,7 +181,7 @@ shift $((OPTIND-1))  #This tells getopts to move on to the next argument.
 #' ## Define User-dependent Variables
 #' Repository root and repository path depend on the user, hence they are 
 #' specified after commandline parsing
-REPOROOT=/home/quagadmin/simg
+REPOROOT=/home/$REMOTEUSER/simg
 REPOPATH=$REPOROOT/quagtsp-sidef
 
 #' ## Run Updates
