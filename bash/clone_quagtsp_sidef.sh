@@ -22,7 +22,7 @@
 #' General behavior of the script is driven by the following settings
 #+ bash-env-setting, eval=FALSE
 set -o errexit    # exit immediately, if single command exits with non-zero status
-set -o nounset    # treat unset variables as errors
+# set -o nounset    # treat unset variables as errors
 set -o pipefail   # return value of pipeline is value of last command to exit with non-zero status
                   #  hence pipe fails if one command in pipe fails
 
@@ -106,8 +106,7 @@ log_msg () {
 #+ update-pkg-fun
 clone_repo () {
   local l_SERVER=$1
-  local QSRCDIR=""
-  local QHTZDIR=""
+  
   log_msg 'clone_repo' " ** Running update on $l_SERVER"
   if [ "$REFERENCE" != "" ]
   then
