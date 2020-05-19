@@ -204,15 +204,15 @@ EndOfSNPpitsh
 #' from the original installation script.
 #+ set-permission-fun
 set_permission () {
-  find -L ${SNP_HOME}/ -type d -print0 |xargs -0 chmod 750
-  find -L ${SNP_HOME}/ -type f -print0 |xargs -0 chmod 640
-  chmod 750 ${SNP_HOME}/bin/*
-  chmod 750 ${SNP_HOME}/contrib/bin/*
+  find -L ${SNP_HOME}/ -type d -print0 |xargs -0 chmod 755
+  find -L ${SNP_HOME}/ -type f -print0 |xargs -0 chmod 644
+  chmod 755 ${SNP_HOME}/bin/*
+  chmod 755 ${SNP_HOME}/contrib/bin/*
   mkdir -p ${SNP_HOME}/regression/tmp
-  chmod 770 ${SNP_HOME}/regression/tmp
+  chmod 775 ${SNP_HOME}/regression/tmp
   chown -R -L ${ADMINUSER}:$ADMINGROUP $SNP_HOME
   chown ${ADMINUSER}:$ADMINGROUP /usr/local/bin/snppit
-  chmod 750 /usr/local/bin/snppit
+  chmod 755 /usr/local/bin/snppit
 }
 
 #' ### Checking Installation of Perl
