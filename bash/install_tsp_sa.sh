@@ -230,6 +230,68 @@ check_perl () {
 }
 
 
+#' ### Check for Multiple Postgres Installations
+#' It is verified that only one version of PG is installed
+#+ multiple-pg-check-fun
+multiple_pg_installations () {
+    info "checking for multiple postgresql versions"
+    COUNT=$(dpkg -l postgresql* | egrep 'ii ' |egrep "object-relational SQL database, version" |wc -l)
+    if [ $COUNT -gt 1 ]; then
+        error "You have several installations of the PostgreSQL server"
+        dpkg -l postgresql* | egrep 'ii ' |egrep "object-relational SQL database, version"
+        info "Only one postgresq installation is allowed"
+        info "BEWARE: you need a postgresql version >=9.3"
+        err_exit "deinstall unwanted postgresql, Sorry!"
+    fi
+}
+
+#' ### Obtain Postgres Version
+#' Get the version of the installed pg instance
+#+ get-pg-version-fun
+get_pg_version () {
+    info "collecting PG_version information"
+    # we get here only after we have tested that there is only one
+    # version of postgresql installed.
+    # need PG_ALLVERSION  like 9.4 or 10
+    # need PG_SUBVERSION  like 4
+    # need PG_VERSION     like 9
+    # need PG_PACKET      like postgresql_11
+    PG_PACKET=$(dpkg -l postgresql*    | egrep 'ii ' |egrep "SQL database, version" |awk '{print $2}')
+    PG_SUBVERSION=''
+    if [ -n "$PG_PACKET"  ]; then
+       if [[ $PG_PACKET = *9.* ]]; then
+# subv wird packet bei 10 11 etc
+          PG_SUBVERSION=$(dpkg -l postgresql*| egrep 'ii ' |egrep "SQL database, version" |awk '{print $2}'|sed -e 's/postgresql-9.//')
+       else
+          PG_SUBVERSION=' '
+          echo no subversion
+       fi
+    fi
+
+    PG_ALLVERSION=$(dpkg -l postgresql*| egrep 'ii ' |egrep "SQL database, version" |awk '{print $2}'|sed -e 's/postgresql-//')
+    PG_VERSION=$(echo $PG_ALLVERSION |  cut -d. -f1)
+    echo packet_____:$PG_PACKET
+    echo version____:$PG_VERSION
+    echo subversion_:$PG_SUBVERSION
+    echo allversion_:$PG_ALLVERSION
+}
+
+#' ### Check PG Version Requirement
+#' The pg database package must be newer than a given version
+#+ check-pg-version-fun
+check_pg_version () {
+  if [ -n "$PG_PACKET" ]; then
+     if [ ${PG_VERSION} -eq 9 ] && [ ${PG_SUBVERSION} -le 3 ] ; then
+         error "you need to have postgresql version > 9.3, sorry"
+     fi
+     ok "operational version of postgresql installed:" $PG_PACKET
+  else
+     err_exit "Cannot find operational db installation" 
+  fi
+  
+}
+
+
 #' ## Main Body of Script
 #' The main body of the script starts here.
 #+ start-msg, eval=FALSE
@@ -277,6 +339,23 @@ set_permission
 #' Check whether perl is installed
 log_msg "$SCRIPT" "Check perl ..."
 check_perl
+
+#' ### Postgres
+#' Checks and configurations related to the postgres (pg) DB. First, check whether
+#' multiple pg instances are installed
+#+ multiple-pg-install
+multiple_pg_installations
+
+#' ### Determine PG Version
+#' Determine the version of the pg installation
+#+ get-pg-version
+get_pg_version
+
+#' ### Check Required PG Version
+#' PG version must at least be 9.3 which is checked
+#+ check-pg-version
+check_pg_version
+
 
 
 #' ## End of Script
