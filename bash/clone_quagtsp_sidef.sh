@@ -108,29 +108,31 @@ clone_repo () {
   local l_SERVER=$1
   
   log_msg 'clone_repo' " ** Running update on $l_SERVER"
-  if [ "$REFERENCE" == "tsp-sa" ]
+  if [ "$REFERENCE" != "" ]
   then
     log_msg 'clone_repo' " ** Cloning branch $REFERENCE ..."
-    ssh $REMOTEUSER@$l_SERVER 'QSRCDIR=/home/quagadmin/simg; \
-QHTZDIR=${QSRCDIR}/quagtsp-sidef; \
-if [ ! -d "$QSRCDIR" ]; then mkdir -p $QSRCDIR;fi; \
-if [ ! -d "$QHTZDIR" ]; then \
-  git -C "$QSRCDIR" clone https://github.com/pvrqualitasag/quagtsp-sidef.git -b tsp-sa; \
-else \
-  echo "$QHTZDIR already exists, run updated_quagzws_htz.sh"; \
+    SSHCMD="QSRCDIR=$REPOROOT; 
+QHTZDIR=$REPOPATH;"' 
+if [ ! -d "$QSRCDIR" ]; then mkdir -p $QSRCDIR;fi; 
+if [ ! -d "$QHTZDIR" ]; then 
+  git -C "$QSRCDIR" clone https://github.com/pvrqualitasag/quagtsp-sidef.git -b '"$REFERENCE"'; 
+else 
+  echo "$QHTZDIR already exists, run updated_quagzws_htz.sh"; 
 fi'
+    log_msg 'clone_repo' " ** SSH command: $SSHCMD"
   else
     log_msg 'clone_repo' " ** Cloning master ..."
-    ssh $REMOTEUSER@$l_SERVER 'QSRCDIR=/home/quagadmin/simg; \
-QHTZDIR="$QSRCDIR"/quagtsp-sidef; \
-echo "QHTZDIR is $QHTZDIR ..."; \
-if [ ! -d "$QSRCDIR" ]; then mkdir -p $QSRCDIR;fi; \
-if [ ! -d "$QHTZDIR" ]; then \
-  git -C "$QSRCDIR" clone https://github.com/pvrqualitasag/quagtsp-sidef.git; \
-else \
-  echo "$QHTZDIR already exists, run updated_quagzws_htz.sh"; \
+    SSHCMD="QSRCDIR=$REPOROOT; 
+QHTZDIR=$REPOPATH;"' 
+if [ ! -d "$QSRCDIR" ]; then mkdir -p $QSRCDIR;fi; 
+if [ ! -d "$QHTZDIR" ]; then 
+  git -C "$QSRCDIR" clone https://github.com/pvrqualitasag/quagtsp-sidef.git; 
+else 
+  echo "$QHTZDIR already exists, run updated_quagzws_htz.sh"; 
 fi'
+    log_msg 'clone_repo' " ** SSH command: $SSHCMD"
   fi
+  ssh $REMOTEUSER@$l_SERVER "$SSHCMD"
 }
 
 
@@ -141,8 +143,8 @@ fi'
 #+ local-update-repo
 local_clone_repo () {
   log_msg 'local_clone_repo' "Running update on $SERVER"
-  QSRCDIR=/home/quagadmin/simg
-  QHTZDIR=${QSRCDIR}/quagtsp_sidef
+  QSRCDIR=$REPOROOT
+  QHTZDIR=$REPOPATH
   if [ ! -d "$QSRCDIR" ]; then mkdir -p $QSRCDIR;fi
 
   # check whether we are inside of a singularity container
@@ -176,9 +178,7 @@ REMOTEUSER=quagadmin
 SERVERS=(1-htz.quagzws.com 2-htz.quagzws.com)
 SERVERNAME=""
 REFERENCE=""
-REPOROOT=/home/quagadmin/simg
-REPOPATH=$REPOROOT/quagtsp_sidef
-while getopts ":b:s:h" FLAG; do
+while getopts ":b:s:u:h" FLAG; do
   case $FLAG in
     h)
       usage "Help message for $SCRIPT"
@@ -202,6 +202,12 @@ while getopts ":b:s:h" FLAG; do
 done
 
 shift $((OPTIND-1))  #This tells getopts to move on to the next argument.
+
+#' ## Define User-dependent Variables
+#' Repository root and repository path depend on the user, hence they are 
+#' specified after commandline parsing
+REPOROOT=/home/${REMOTEUSER}/simg
+REPOPATH=$REPOROOT/quagtsp_sidef
 
 #' ## Run Updates
 #' Decide whether to run the update on one server or on all servers on the list
