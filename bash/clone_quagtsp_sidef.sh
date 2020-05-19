@@ -113,8 +113,8 @@ clone_repo () {
     log_msg 'clone_repo' " ** Cloning branch $REFERENCE ..."
     ssh $REMOTEUSER@$l_SERVER "QSRCDIR=/home/quagadmin/simg; \
 QHTZDIR=${QSRCDIR}/quagtsp_sidef; \
-if [ ! -d \"$QSRCDIR\" ]; then mkdir -p $QSRCDIR;fi; \
-if [ ! -d \"$QHTZDIR\" ]; then \
+if [ ! -d $QSRCDIR ]; then mkdir -p $QSRCDIR;fi; \
+if [ ! -d $QHTZDIR ]; then \
   git -C $QSRCDIR clone https://github.com/pvrqualitasag/quagtsp-sidef.git -b $REFERENCE; \
 else \
   echo $QHTZDIR already exists, run updated_quagzws_htz.sh; \
