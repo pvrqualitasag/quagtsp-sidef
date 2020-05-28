@@ -3,8 +3,9 @@ OSVersion: bionic
 MirrorURL: http://archive.ubuntu.com/ubuntu/
 
 %post
-  sed -i 's/main/main restricted universe/g' /etc/apt/sources.list
-  apt update
+# the following causes multiple entries in /etc/apt/sources.list
+#  sed -i 's/main/main restricted universe/g' /etc/apt/sources.list
+#  apt update
 
   # install software properties commons for add-apt-repository
   apt install -y software-properties-common apt-utils
