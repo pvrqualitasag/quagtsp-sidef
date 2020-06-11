@@ -20,6 +20,7 @@ ECHO=/bin/echo                             # PATH to echo                       
 DATE=/bin/date                             # PATH to date                            #
 BASENAME=/usr/bin/basename                 # PATH to basename function               #
 DIRNAME=/usr/bin/dirname                   # PATH to dirname function                #
+MKDIR=/bin/mkdir                        # PATH to mkdir                           #
 # ---------------------------------------- # --------------------------------------- #
 # directories                              #                                         #
 INSTALLDIR=`$DIRNAME ${BASH_SOURCE[0]}`    # installation dir of bashtools on host   #
@@ -39,9 +40,10 @@ SERVER=`hostname`                          # put hostname of server in variable 
 usage () {
   local l_MSG=$1
   $ECHO "Usage Error: $l_MSG"
-  $ECHO "Usage: $SCRIPT -d <simg_definition> -w <work_dir>"
-  $ECHO "  where    <simg_definition>     --  singularity definition file"
-  $ECHO "           <work_dir> (optional) -- work directory where image is build"
+  $ECHO "Usage: $SCRIPT -d <simg_definition> -l <simg_label> -w <work_dir>"
+  $ECHO "  where    <simg_definition>        --  singularity definition file"
+  $ECHO "           <simg_label> (optional)  --  singularity image label"
+  $ECHO "           <work_dir>   (optional)  --  work directory where image is build"
   $ECHO ""
   exit 1
 }
@@ -69,6 +71,19 @@ log_msg () {
   $ECHO "[${l_RIGHTNOW} -- ${l_CALLER}] $l_MSG"
 }
 
+#' ### Check Directory Existence
+#' Passed directory is checked for existence, if it is not found it is created
+#+ check-exist-dir-create-fun
+check_exist_dir_create () {
+  local l_check_dir=$1
+  if [ ! -d "$l_check_dir" ]
+  then
+    log_msg check_exist_dir_create "CANNOT find directory: $l_check_dir ==> create it"
+    $MKDIR -p $l_check_dir    
+  fi  
+
+}
+
 
 ### # ====================================================================== #
 ### # Main part of the script starts here ...
@@ -80,14 +95,18 @@ start_msg
 ### # Notice there is no ":" after "h". The leading ":" suppresses error messages from
 ### # getopts. This is required to get my unrecognized option code to work.
 SIMGDEF=""
-SWORKDIR=/home/quagadmin/simg/img/thesnppit
-while getopts ":d:w:h" FLAG; do
+SIMGLABEL=tsp-sa
+SWORKDIR=/home/quagadmin/simg/img/$SIMGLABEL
+while getopts ":d:l:w:h" FLAG; do
   case $FLAG in
     h)
       usage "Help message for $SCRIPT"
       ;;
     d)
       SIMGDEF=$OPTARG
+      ;;
+    l)
+      SIMGLABEL=$OPTARG
       ;;
     w)
       SWORKDIR=$OPTARG
@@ -110,12 +129,7 @@ fi
 
 
 ### # check whether working directory exists
-if [ ! -d "$SWORKDIR" ]
-then
-  log_msg $SCRIPT " * Cannot find working directory: $SWORKDIR - create it"
-  mkdir -p $SWORKDIR
-  chown quagadmin:quagadmin $SWORKDIR
-fi
+check_exist_dir_create $SWORKDIR
 
 ### # change to work directory
 CURRWD=`pwd`
@@ -131,7 +145,7 @@ fi
 
 
 ### # create the image file
-SIMGFN=`date +"%Y%m%d%H%M%S"`_quagtsp_ubuntu1804lts.img
+SIMGFN=`date +"%Y%m%d%H%M%S"`_quag_${SIMGLABEL}_ubuntu1804lts.img
 log_msg $SCRIPT " * Creating image file: $SIMGFN ..."
 singularity image.create --size 1024 $SIMGFN
 

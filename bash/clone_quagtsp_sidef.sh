@@ -22,7 +22,11 @@
 #' General behavior of the script is driven by the following settings
 #+ bash-env-setting, eval=FALSE
 set -o errexit    # exit immediately, if single command exits with non-zero status
+<<<<<<< HEAD
 set -o nounset    # treat unset variables as errors
+=======
+# set -o nounset    # treat unset variables as errors
+>>>>>>> origin/tsp-sa
 set -o pipefail   # return value of pipeline is value of last command to exit with non-zero status
                   #  hence pipe fails if one command in pipe fails
 
@@ -107,8 +111,8 @@ log_msg () {
 clone_repo () {
   local l_SERVER=$1
   log_msg 'clone_repo' "Running update on $l_SERVER"
-  SSHCMD='QSRCDIR=/home/'"${REMOTEUSER}"'/simg; 
-QHTZDIR=${QSRCDIR}/quagtsp_sidef; 
+  SSHCMD="QSRCDIR=$REPOROOT; 
+QHTZDIR=$REPOPATH;"' 
 if [ ! -d "$QSRCDIR" ];then mkdir -p ${QSRCDIR};fi;'
   # distinguish between cloning the master or a branch, where the branch is given by $REFERENCE
    if [ "$REFERENCE" != "" ]
@@ -136,8 +140,8 @@ if [ ! -d "$QSRCDIR" ];then mkdir -p ${QSRCDIR};fi;'
 #+ local-update-repo
 local_clone_repo () {
   log_msg 'local_clone_repo' "Running update on $SERVER"
-  QSRCDIR=/home/${REMOTEUSER}/simg
-  QHTZDIR=${QSRCDIR}/quagtsp_sidef
+  QSRCDIR=$REPOROOT
+  QHTZDIR=$REPOPATH
   if [ ! -d "$QSRCDIR" ]; then mkdir -p $QSRCDIR;fi
 
   # check whether we are inside of a singularity container
@@ -171,8 +175,6 @@ REMOTEUSER=quagadmin
 SERVERS=(1-htz.quagzws.com 2-htz.quagzws.com)
 SERVERNAME=""
 REFERENCE=""
-REPOROOT=/home/quagadmin/simg
-REPOPATH=$REPOROOT/quagtsp_sidef
 while getopts ":b:s:u:h" FLAG; do
   case $FLAG in
     h)
@@ -197,6 +199,13 @@ while getopts ":b:s:u:h" FLAG; do
 done
 
 shift $((OPTIND-1))  #This tells getopts to move on to the next argument.
+
+#' ## Define User-dependent Variables
+#' Repository root and repository path depend on the user, hence they are 
+#' specified after commandline parsing
+REPOROOT=/home/${REMOTEUSER}/simg
+REPOPATH=$REPOROOT/quagtsp_sidef
+
 
 #' ## Run Updates
 #' Decide whether to run the update on one server or on all servers on the list

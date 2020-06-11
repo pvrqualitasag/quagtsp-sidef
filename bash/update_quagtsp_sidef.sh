@@ -106,16 +106,18 @@ log_msg () {
 #+ update-pkg-fun
 pull_repo () {
   local l_SERVER=$1
-  log_msg 'pull_repo' "Running update on $l_SERVER"
+  log_msg 'pull_repo' " ** Running update on $l_SERVER"
   if [ "$REFERENCE" != "" ]
   then
-    SSHCMD='QTSPDIR=/home/'"${REMOTEUSER}"'/simg/quagtsp-sidef;
-git -C "$QTSPDIR" pull https://github.com/pvrqualitasag/quagtsp-sidef.git -b '"$REFERENCE"
+    SSHCMD="cd $REPOPATH;"'
+git fetch;    
+git checkout origin/'"$REFERENCE"
   else
-    SSHCMD='QTSPDIR=/home/'"${REMOTEUSER}"'/simg/quagtsp-sidef;
+    SSHCMD="QTSPDIR=$REPOPATH;"' \
 git -C "$QTSPDIR" pull https://github.com/pvrqualitasag/quagtsp-sidef.git'
   fi
-  ssh $REMOTEUSER@$l_SERVER $SSHCMD
+  log_msg 'pull_repo' " ** SSHCMD: $SSHCMD"
+  ssh $REMOTEUSER@$l_SERVER "$SSHCMD"
 }
 
 
@@ -126,7 +128,7 @@ git -C "$QTSPDIR" pull https://github.com/pvrqualitasag/quagtsp-sidef.git'
 #+ local-update-repo
 local_pull_repo () {
   log_msg 'local_pull_repo' "Running update on $SERVER"
-  QTSPDIR=/home/${REMOTEUSER}/simg/quagtsp-sidef
+  QTSPDIR=$REPOPATH
 
   # check whether we are inside of a singularity container
   if [ "$REFERENCE" != "" ]
@@ -151,8 +153,6 @@ REMOTEUSER=quagadmin
 SERVERS=(1-htz.quagzws.com 2-htz.quagzws.com)
 SERVERNAME=""
 REFERENCE=""
-REPOROOT=/home/quagadmin/simg
-REPOPATH=$REPOROOT/quagtsp_sidef
 while getopts ":b:s:u:h" FLAG; do
   case $FLAG in
     h)
@@ -177,6 +177,13 @@ while getopts ":b:s:u:h" FLAG; do
 done
 
 shift $((OPTIND-1))  #This tells getopts to move on to the next argument.
+
+#' ## Define User-dependent Variables
+#' Repository root and repository path depend on the user, hence they are 
+#' specified after commandline parsing
+REPOROOT=/home/$REMOTEUSER/simg
+REPOPATH=$REPOROOT/quagtsp-sidef
+
 
 #' ## Run Updates
 #' Decide whether to run the update on one server or on all servers on the list
