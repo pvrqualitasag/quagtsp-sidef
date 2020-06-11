@@ -63,9 +63,6 @@ ADMINGROUP=zws
 DB_ENCODING=utf8
 DB_NAME=TheSNPpit
 
-#' ### PG configuration
-PGDATADIR=/home/zws/thesnppit/pgdata
-
 
 #' ## Functions
 #' The following definitions of general purpose functions are local to this script.
