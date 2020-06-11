@@ -71,13 +71,36 @@ TSPWORKDIR=/home/zws/tsp
 /home/zws/simg/quagtsp-sidef/bash/init_tsp_workdir.sh -w $TSPWORKDIR
 ```
 
+Now that the working directory is initialised, we can try to start the db-server
 
 ```
 TSPWORKDIR=/home/zws/tsp
 DATADIR=${TSPWORKDIR}/data
-LOGDIR=${TSPWORKDIR}/log
 /usr/lib/postgresql/10/bin/initdb -D $DATADIR -A trust -U zws
 ```
+
+The above command cannot be run as root, but must be run as user who owns the DB-process. Hence as user 'zws' we get
+
+```
+# starting a container shell
+$ singularity shell /home/quagadmin/simg/img/tsp-sa/tsp.simg
+Singularity: Invoking an interactive shell within container...
+
+# Initialising the DB-server
+Singularity tsp.simg:~> TSPWORKDIR=/home/zws/tsp
+Singularity tsp.simg:~> DATADIR=${TSPWORKDIR}/data
+Singularity tsp.simg:~> /usr/lib/postgresql/10/bin/initdb -D $DATADIR -A trust -U zws
+```
+
+The DB-server can be started as
+
+```
+LOGDIR=${TSPWORKDIR}/log
+LOGFILE=${LOGDIR}/`date +"%Y%m%d%H%M%S"`_pg_logfile.log
+/usr/lib/postgresql/10/bin/pg_ctl -D /home/zws/tsp/data -l $LOGFILE start
+```
+
+
 
 The database configuration consists of four steps. 
 
