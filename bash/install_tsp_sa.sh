@@ -217,8 +217,13 @@ EndOfSNPpitsh
   VAR_DIR=$SNP_HOME/var
   if [ ! -d "$VAR_DIR" ];then
     mkdir -p $VAR_DIR
-    chmod 777 $VAR_DIR
   fi
+  # create log subdirectory
+  LOG_DIR=$VAR_DIR/log
+  if [ ! -d "$LOG_DIR" ];then
+    mkdir -p $LOG_DIR
+  fi
+  chmod -R 777 $VAR_DIR
   
 }
 
