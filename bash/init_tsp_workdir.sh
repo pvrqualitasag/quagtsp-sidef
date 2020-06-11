@@ -166,11 +166,11 @@ fi
 #+ update-dir
 if [ "$DATADIR" == "" ]
 then
-  DATADIR=${TSPWORKDIR}/data
+  DATADIR=${TSPWORKDIR}/pgdata
 fi
 if [ "$LOGDIR" == "" ]
 then
-  LOGDIR=${TSPWORKDIR}/log
+  LOGDIR=${TSPWORKDIR}/pglog
 fi
 
 #' ## Create TSP Working Directory
