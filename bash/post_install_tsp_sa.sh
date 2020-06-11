@@ -49,6 +49,7 @@ SERVER=`hostname`                          # put hostname of server in variable 
 #' The items that cannot be used are commented out. 
 #+ config-start
 # BASE_DIR=/usr/local
+SNP_HOME=/usr/local/TheSNPpit_current
 ADMINUSER=snpadmin
 OSUSER=zws
 # ADMINGROUP=snp
@@ -60,8 +61,8 @@ TSPWORKDIR=/home/zws/tsp
 PGDATADIR=${TSPWORKDIR}/pgdata
 PGLOGDIR=${TSPWORKDIR}/pglog
 LOGFILE=$PGLOGDIR/`date +"%Y%m%d%H%M%S"`_postgres.log
-PGDATATRG=''# PGDATATRG=/qualstorzws01/data_tmp/tsp/pgdata
-PGLOGTRG='' # PGLOGTRG=/qualstorzws01/data_tmp/tsp/pglog
+PGDATATRG='' # PGDATATRG=/qualstorzws01/data_tmp/tsp/pgdata
+PGLOGTRG=''  # PGLOGTRG=/qualstorzws01/data_tmp/tsp/pglog
 
 #' ## Functions
 #' The following definitions of general purpose functions are local to this script.
@@ -474,7 +475,7 @@ configure_postgresql
 
 #' move data items from data directory to data target
 #+ mv-data-item
-if [ ! -z "$PGDATATRG" ]
+if [ "$PGDATATRG" != "" ]
 then
   log_msg "$SCRIPT" ' * Move data items ...'
   mv_data_item
