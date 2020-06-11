@@ -125,8 +125,8 @@ start_msg
 #' getopts. This is required to get my unrecognized option code to work.
 #+ getopts-parsing, eval=FALSE
 TSPWORKDIR=${HOME}/tsp
-DATADIR=${TSPWORKDIR}/data
-LOGDIR=${TSPWORKDIR}/log
+DATADIR=""
+LOGDIR=""
 while getopts ":d:l:w:h" FLAG; do
   case $FLAG in
     h)
@@ -160,6 +160,18 @@ if test "$TSPWORKDIR" == ""; then
   usage "-w <tsp_work_directory> not defined"
 fi
 
+#' ## Update Directories
+#' If the data directory and the log directory were not specified, then 
+#' define them based on the TSPWORKDIR
+#+ update-dir
+if [ "$DATADIR" == "" ]
+then
+  DATADIR=${TSPWORKDIR}/data
+fi
+if [ "$LOGDIR" == "" ]
+then
+  LOGDIR=${TSPWORKDIR}/log
+fi
 
 #' ## Create TSP Working Directory
 #' Create TSP working directory, if it does not exist
