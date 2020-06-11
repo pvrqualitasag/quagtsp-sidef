@@ -107,24 +107,24 @@ log_msg () {
 clone_repo () {
   local l_SERVER=$1
   log_msg 'clone_repo' "Running update on $l_SERVER"
-  SSHCMD='QSRCDIR=/home/'"${REMOTEUSER}"'/simg; \
-QHTZDIR=${QSRCDIR}/quagtsp_sidef; \
-if [ ! -d "$QSRCDIR" ]; then mkdir -p $QSRCDIR;fi; \ '
+  SSHCMD='QSRCDIR=/home/'"${REMOTEUSER}"'/simg; 
+QHTZDIR=${QSRCDIR}/quagtsp_sidef; 
+if [ ! -d "$QSRCDIR" ];then mkdir -p ${QSRCDIR};fi;'
   # distinguish between cloning the master or a branch, where the branch is given by $REFERENCE
-  if [ "$REFERENCE" != "" ]
-  then
-    SSHCMD="${SSHCMD}"'if [ ! -d "$QHTZDIR" ]; then \
-  git -C "$QSRCDIR" clone https://github.com/pvrqualitasag/quagtsp-sidef.git -b '"$REFERENCE"'; \
-else \
-  echo "$QHTZDIR already exists, run updated_quagzws_htz.sh"; \
-fi'
-  else
-    SSHCMD="${SSHCMD}"'if [ ! -d "$QHTZDIR" ]; then \
-  git -C "$QSRCDIR" clone https://github.com/pvrqualitasag/quagtsp-sidef.git; \
-else \
-  echo "$QHTZDIR already exists, run updated_quagzws_htz.sh"; \
-fi'
-  fi
+   if [ "$REFERENCE" != "" ]
+   then
+     SSHCMD="${SSHCMD}"'if [ ! -d "$QHTZDIR" ];then 
+   git -C "$QSRCDIR" clone https://github.com/pvrqualitasag/quagtsp-sidef.git -b '"$REFERENCE"';
+ else 
+   echo "$QHTZDIR already exists, run updated_quagzws_htz.sh";
+ fi'
+   else
+     SSHCMD="${SSHCMD}"'if [ ! -d "$QHTZDIR" ];then 
+   git -C "$QSRCDIR" clone https://github.com/pvrqualitasag/quagtsp-sidef.git; 
+ else 
+   echo "$QHTZDIR already exists, run updated_quagzws_htz.sh";
+ fi'
+   fi
   ssh $REMOTEUSER@$l_SERVER $SSHCMD
 }
 
