@@ -335,7 +335,7 @@ check_hba_conf () {
         echo "host  all   snpadmin   ::1/128        trust" >>$ETC_DIR/pg_hba.conf
         cat $ETC_DIR/pg_hba.conf-saved-$NOW >>$ETC_DIR/pg_hba.conf
         info "Note: $ETC_DIR/pg_hba.conf saved to $ETC_DIR/pg_hba.conf-saved-$NOW and adapted"
-        su -s /bin/bash -c "$PG_CTL -D $DATA_DIR reload" postgres >/dev/null
+        $PG_CTL reload -D $DATA_DIR >/dev/null
     fi
 }
 
@@ -343,6 +343,7 @@ check_hba_conf () {
 #' Configuration of pg database
 #+ config-pg-fun
 configure_postgresql () {
+    log_msg 'configure_postgresql' ' ** Start pg-db config ...'
     # create snpadmin with superuser privilege
     # info "Running configure_postgresql ..."
     # as of version 10 no subversion: postgresql-10: use the 10
@@ -352,7 +353,7 @@ configure_postgresql () {
     if [ ! -d $ETC_DIR ]; then
         err_exit "ETC_DIR $ETC_DIR doesn't exist"
     fi
-
+    log_msg 'configure_postgresql' ' ** Checking pg-access ...'
     has_pg_access
     if [ $? -ne 0 ]; then
         error "You have no right to access postgresql ..."
