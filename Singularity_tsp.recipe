@@ -3,25 +3,22 @@ OSVersion: bionic
 MirrorURL: http://archive.ubuntu.com/ubuntu/
 
 %post
-# the following causes multiple entries in /etc/apt/sources.list
-#  sed -i 's/main/main restricted universe/g' /etc/apt/sources.list
-#  apt update
+  apt-get update
+  apt-get upgrade -y
 
-  # install software properties commons for add-apt-repository
-  apt install -y software-properties-common apt-utils
-  apt update
-  apt upgrade -y
+  # install software properties commons for add-apt-get-repository
+  apt-get install -y software-properties-common apt-utils
 
   # Install system software for TheSNPpit
-  apt install -y gcc perl make wget vim less screen curl locales time rsync gawk tzdata git dos2unix sshpass htop
-  apt install -y libdbd-pg-perl libecpg6 libecpg-dev libdbi-perl libinline-perl libmodern-perl-perl libcloog-ppl1 libcloog-ppl-dev libfile-slurp-perl libpq5 libjudy-dev
-  apt update -y
+  apt-get install -y gcc perl make wget vim less screen curl locales time rsync gawk tzdata git dos2unix sshpass htop
+  apt-get install -y libdbd-pg-perl libecpg6 libecpg-dev libdbi-perl libinline-perl libmodern-perl-perl libcloog-ppl1 libcloog-ppl-dev libfile-slurp-perl libpq5 libjudy-dev
+  apt-get update -y
   echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" >> /etc/apt/sources.list.d/pgdg.list
   wget -q https://www.postgresql.org/media/keys/ACCC4CF8.asc -O - | apt-key add -
-  apt install -y postgresql postgresql-contrib
-  apt update -y
-  apt upgrade -y
-  apt clean
+  apt-get install -y postgresql postgresql-contrib
+  apt-get update -y
+  apt-get upgrade -y
+  apt-get clean
   
   # Install additional perl-modules for TheSNPPit
   curl -sSL "https://raw.githubusercontent.com/pvrqualitasag/quagtsp-sidef/master/etc/needed_perl_modules_tsp" > needed_perl_modules_tsp

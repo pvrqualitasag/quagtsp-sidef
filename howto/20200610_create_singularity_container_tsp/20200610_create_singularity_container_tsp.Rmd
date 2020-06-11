@@ -1,0 +1,15 @@
+---
+title: "Singularity Container Image for TheSNPpit"
+author: "Peter von Rohr"
+date: "6/10/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Disclaimer
+The creation of the singularity image for TheSNPpit is re-designed based on the experience from setting up a singularity container for PopRep.
+
+
