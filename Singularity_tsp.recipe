@@ -36,6 +36,9 @@ MirrorURL: http://archive.ubuntu.com/ubuntu/
   # permissions for postgres
   chmod -R 755 /var/lib/postgresql/10/main
   chmod -R 777 /var/run/postgresql
+  
+  # bind-point for db-working directory
+  mkdir -p /home/zws
 
   # dconf problem
   mkdir -p /run/user/501
