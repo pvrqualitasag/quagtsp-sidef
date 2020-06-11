@@ -406,6 +406,20 @@ run_install_testdb () {
   
 }
 
+#' ## Check Existence of TSP WorkDir
+#' If working directory for tsp does not exist, create it
+#+ check-tsp-workdir-fun
+check_tsp_workdir () {
+  log_msg 'check_tsp_workdir' ' ** Checking existence of tsp-workdir ...'
+  if [ ! -d "$TSPWORKDIR" ]
+  then
+    log_msg 'check_tsp_workdir' ' ** Create tsp-workdir ...'
+    $INSTALLDIR/init_tsp_workdir.sh
+  else
+    log_msg 'check_tsp_workdir' ' ** TSP-Workdir found ...'
+  fi
+}
+
 #' ##  #################################################################### ###
 #' ## 
 #' ##    Main Body of Script
@@ -426,6 +440,13 @@ PSQL="/usr/lib/postgresql/$PG_ALLVERSION/bin/psql"
 CREATEDB="/usr/lib/postgresql/$PG_ALLVERSION/bin/createdb"
 PGCTL="/usr/lib/postgresql/$PG_ALLVERSION/bin/pg_ctl"
 PGISREADY="/usr/lib/postgresql/$PG_ALLVERSION/bin/pg_isready"
+
+
+#' ### Check Existence of TSP-Working-Dir
+#' Data-directory and Log-directory of pg are put into a working directory.
+#' The following function checks whether this directory exists or not
+#+ check-tsp-workdir
+check_tsp_workdir
 
 
 #' ### Configruation of PG
