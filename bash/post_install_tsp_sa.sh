@@ -59,7 +59,7 @@ TEST_DB_NAME=TheSNPpit_test
 TSPWORKDIR=/home/zws/tsp
 PGDATADIR=${TSPWORKDIR}/pgdata
 PGLOGDIR=${TSPWORKDIR}/pglog
-LOGFILE=$PGLOGTRG/`date +"%Y%m%d%H%M%S"`_postgres.log
+LOGFILE=$PGLOGDIR/`date +"%Y%m%d%H%M%S"`_postgres.log
 # PGDATATRG=/qualstorzws01/data_tmp/tsp/pgdata
 # PGLOGTRG=/qualstorzws01/data_tmp/tsp/pglog
 
