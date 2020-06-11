@@ -60,8 +60,8 @@ TSPWORKDIR=/home/zws/tsp
 PGDATADIR=${TSPWORKDIR}/pgdata
 PGLOGDIR=${TSPWORKDIR}/pglog
 LOGFILE=$PGLOGDIR/`date +"%Y%m%d%H%M%S"`_postgres.log
-# PGDATATRG=/qualstorzws01/data_tmp/tsp/pgdata
-# PGLOGTRG=/qualstorzws01/data_tmp/tsp/pglog
+PGDATATRG=''# PGDATATRG=/qualstorzws01/data_tmp/tsp/pgdata
+PGLOGTRG='' # PGLOGTRG=/qualstorzws01/data_tmp/tsp/pglog
 
 #' ## Functions
 #' The following definitions of general purpose functions are local to this script.
@@ -348,7 +348,7 @@ configure_postgresql () {
     # as of version 10 no subversion: postgresql-10: use the 10
     # VERSION is now version.subversion as used in ETC_DIR
     PG_CTL="/usr/lib/postgresql/${PG_ALLVERSION}/bin/pg_ctl"
-    ETC_DIR="/etc/postgresql/${PG_ALLVERSION}/main"
+    ETC_DIR="$PGDATADIR"
     if [ ! -d $ETC_DIR ]; then
         err_exit "ETC_DIR $ETC_DIR doesn't exist"
     fi
@@ -358,17 +358,17 @@ configure_postgresql () {
         error "You have no right to access postgresql ..."
     fi
 
-    DATA_DIR=$(echo "show data_directory" |su -l -s /bin/bash -c "psql --tuples-only --quiet --no-align" postgres)
+    DATA_DIR=$(echo "show data_directory" | psql --tuples-only --quiet --no-align postgres)
     if [ ! -d $DATA_DIR ]; then
         err_exit "DATA_DIR $DATA_DIR doesn't exist"
     fi
 
-    echo "select usename from pg_user where usename = '$ADMINUSER'" | psql postgres --tuples-only --quiet --no-align | grep -q $ADMINUSER >/dev/null
+    echo "select usename from pg_user where usename = '$ADMINUSER'" | psql postgres --tuples-only --quiet --no-align postgres | grep -q $ADMINUSER >/dev/null
     if [ $? -eq 0 ]; then
         ok "PostgreSQL ADMINUSER $ADMINUSER exists"
     else
-        su -l -s /bin/bash -c "createuser --superuser $ADMINUSER" postgres
-        su -s /bin/bash -c "$PG_CTL -D $DATA_DIR reload" postgres >/dev/null
+        createuser --superuser $ADMINUSER
+        $PG_CTL reload -D $DATA_DIR >/dev/null
         ok "PostgreSQL ADMINUSER $ADMINUSER created"
     fi
 
