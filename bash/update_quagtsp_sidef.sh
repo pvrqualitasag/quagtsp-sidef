@@ -109,12 +109,13 @@ pull_repo () {
   log_msg 'pull_repo' "Running update on $l_SERVER"
   if [ "$REFERENCE" != "" ]
   then
-    ssh $REMOTEUSER@$l_SERVER 'QTSPDIR=/home/quagadmin/simg/quagtsp-sidef; \
-git -C "$QTSPDIR" pull https://github.com/pvrqualitasag/quagtsp-sidef.git -b "$REFERENCE"'
+    SSHCMD='QTSPDIR=/home/'"${REMOTEUSER}"'/simg/quagtsp-sidef;
+git -C "$QTSPDIR" pull https://github.com/pvrqualitasag/quagtsp-sidef.git -b '"$REFERENCE"
   else
-    ssh $REMOTEUSER@$l_SERVER 'QTSPDIR=/home/quagadmin/simg/quagtsp-sidef; \
+    SSHCMD='QTSPDIR=/home/'"${REMOTEUSER}"'/simg/quagtsp-sidef;
 git -C "$QTSPDIR" pull https://github.com/pvrqualitasag/quagtsp-sidef.git'
   fi
+  ssh $REMOTEUSER@$l_SERVER $SSHCMD
 }
 
 
@@ -125,7 +126,7 @@ git -C "$QTSPDIR" pull https://github.com/pvrqualitasag/quagtsp-sidef.git'
 #+ local-update-repo
 local_pull_repo () {
   log_msg 'local_pull_repo' "Running update on $SERVER"
-  QTSPDIR=/home/quagadmin/simg/quagtsp-sidef
+  QTSPDIR=/home/${REMOTEUSER}/simg/quagtsp-sidef
 
   # check whether we are inside of a singularity container
   if [ "$REFERENCE" != "" ]
@@ -152,7 +153,7 @@ SERVERNAME=""
 REFERENCE=""
 REPOROOT=/home/quagadmin/simg
 REPOPATH=$REPOROOT/quagtsp_sidef
-while getopts ":b:s:h" FLAG; do
+while getopts ":b:s:u:h" FLAG; do
   case $FLAG in
     h)
       usage "Help message for $SCRIPT"
