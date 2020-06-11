@@ -50,6 +50,7 @@ SERVER=`hostname`                          # put hostname of server in variable 
 #+ config-start
 # BASE_DIR=/usr/local
 SNP_HOME=/usr/local/TheSNPpit_current
+SNP_LIB=${SNP_HOME}/lib
 ADMINUSER=snpadmin
 OSUSER=zws
 # ADMINGROUP=snp
@@ -365,7 +366,7 @@ configure_postgresql () {
         err_exit "DATA_DIR $DATA_DIR doesn't exist"
     fi
 
-    echo "select usename from pg_user where usename = '$ADMINUSER'" | psql postgres --tuples-only --quiet --no-align postgres | grep -q $ADMINUSER >/dev/null
+    echo "select usename from pg_user where usename = '$ADMINUSER'" | psql postgres --tuples-only --quiet --no-align | grep -q $ADMINUSER >/dev/null
     if [ $? -eq 0 ]; then
         ok "PostgreSQL ADMINUSER $ADMINUSER exists"
     else
