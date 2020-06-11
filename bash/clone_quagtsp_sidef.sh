@@ -109,7 +109,7 @@ clone_repo () {
   log_msg 'clone_repo' "Running update on $l_SERVER"
   SSHCMD='QSRCDIR=/home/'"${REMOTEUSER}"'/simg; \
 QHTZDIR=${QSRCDIR}/quagtsp_sidef; \
-if [ ! -d "$QSRCDIR" ]; then mkdir -p $QSRCDIR;fi; \'
+if [ ! -d "$QSRCDIR" ]; then mkdir -p $QSRCDIR;fi; \ '
   # distinguish between cloning the master or a branch, where the branch is given by $REFERENCE
   if [ "$REFERENCE" != "" ]
   then
