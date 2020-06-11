@@ -58,8 +58,10 @@ SERVER=`hostname`                          # put hostname of server in variable 
 usage () {
   local l_MSG=$1
   $ECHO "Usage Error: $l_MSG"
-  $ECHO "Usage: $SCRIPT -w <tsp_work_dir>"
-  $ECHO "  where -w <tsp_work_dir>  --  specify the workdir for tsp (optional)"
+  $ECHO "Usage: $SCRIPT -d <tsp_data_dir> -l <tsp_log_dir> -w <tsp_work_dir>"
+  $ECHO "  where -d <tsp_data_dir>  --  specify the data directory for the tsp database (optional)"
+  $ECHO "        -l <tsp_log_dir>   --  speicfy the log directory for the tsp database (optional)"
+  $ECHO "        -w <tsp_work_dir>  --  specify the workdir for tsp (optional)"
   $ECHO ""
   exit 1
 }
@@ -123,17 +125,21 @@ start_msg
 #' getopts. This is required to get my unrecognized option code to work.
 #+ getopts-parsing, eval=FALSE
 TSPWORKDIR=${HOME}/tsp
-while getopts ":w:h" FLAG; do
+DATADIR=${TSPWORKDIR}/data
+LOGDIR=${TSPWORKDIR}/log
+while getopts ":d:l:w:h" FLAG; do
   case $FLAG in
     h)
       usage "Help message for $SCRIPT"
       ;;
+    d)
+      DATADIR=$OPTARG
+      ;;  
+    l)
+      LOGDIR=$OPTARG
+      ;;  
     w)
-      if test -d $OPTARG; then
-        TSPWORKDIR=$OPTARG
-      else
-        usage "$OPTARG isn't a directory"
-      fi
+      TSPWORKDIR=$OPTARG
       ;;
     :)
       usage "-$OPTARG requires an argument"
@@ -159,6 +165,8 @@ fi
 #' Create TSP working directory, if it does not exist
 #+ check-create-tsp-workdir
 check_exist_dir_create $TSPWORKDIR
+check_exist_dir_create $DATADIR
+check_exist_dir_create $LOGDIR
 
 
 #' ## End of Script
