@@ -54,11 +54,14 @@ OSUSER=zws
 # ADMINGROUP=snp
 DB_ENCODING=utf8
 DB_NAME=TheSNPpit
+TEST_DB_NAME=TheSNPpit_test
 
-PGDATADIR=/home/zws/thesnppit/pgdata
-PGDATATRG=/qualstorzws01/data_tmp/thesnppit/pgdata
-PGLOGTRG=/qualstorzws01/data_tmp/thesnppit/pglog
+TSPWORKDIR=/home/zws/tsp
+PGDATADIR=${TSPWORKDIR}/pgdata
+PGLOGDIR=${TSPWORKDIR}/pglog
 LOGFILE=$PGLOGTRG/`date +"%Y%m%d%H%M%S"`_postgres.log
+# PGDATATRG=/qualstorzws01/data_tmp/tsp/pgdata
+# PGLOGTRG=/qualstorzws01/data_tmp/tsp/pglog
 
 #' ## Functions
 #' The following definitions of general purpose functions are local to this script.
@@ -181,91 +184,36 @@ info () {
     fi >&2
 }
 
-#' ### Determine Base Directory 
-#' Find out were the base directory is.
-#+ get-base-dir
-get_base_dir () {
-    BASE_DIR=$(pwd -P)
-    BASE_DIR=$(echo $BASE_DIR |sed -e "s/TheSNPpit-$CURR_VERSION//")
-
-    echo -n "Installing TheSNPpit in $BASE_DIR (Terminate with Ctrl-C): " && read 
-    if [ ! -d $BASE_DIR ]; then
-        mkdir -p $BASE_DIR
-        info "$BASE_DIR created"
-    fi
-    info "Installing TheSNPpit in $BASE_DIR"
-}
 
 #' ### Installation Of TheSNPPit Database
 #' The database for TheSNPPit is installed
 #+ install-thesnppit-db
 install_thesnppit_db () {
+    local l_DB_NAME=$1
     # does database exist?:
-    $PSQL -l --tuples-only --quiet --no-align --field-separator=' '|awk '{print $1}' |grep "^${DB_NAME}$" >/dev/null
+    $PSQL -l --tuples-only --quiet --no-align --field-separator=' '|awk '{print $1}' |grep "^${l_DB_NAME}$" >/dev/null
     if [ $? -eq 0 ]; then
         ok "TheSNPpit Database exists"
     else
         info "Creating TheSNPpit Database ..."
-        $CREATEDB --encoding=$DB_ENCODING --owner=$ADMINUSER --no-password $DB_NAME
+        $CREATEDB --encoding=$DB_ENCODING --owner=$ADMINUSER --no-password $l_DB_NAME
 
         # check again:
-        $PSQL -l --tuples-only --quiet --no-align --field-separator=' '|awk '{print $1}' |grep "^${DB_NAME}$" >/dev/null
+        $PSQL -l --tuples-only --quiet --no-align --field-separator=' '|awk '{print $1}' |grep "^${l_DB_NAME}$" >/dev/null
         if [ $? -eq 0 ]; then
             ok "TheSNPpit Database exists"
         fi
 
         # fill the newly created database with the structure:
-        $PSQL -q -f ${SNP_LIB}/TheSNPpit.sql $DB_NAME -U $ADMINUSER
+        $PSQL -q -f ${SNP_LIB}/TheSNPpit.sql $l_DB_NAME -U $ADMINUSER
         if [ $? -eq 0 ]; then
             ok "TheSNPpit Database structure created"
         fi
     fi
 
-    # "host    TheSNPpit       snpadmin        127.0.0.1/32            trust"
-    # /etc/postgresql/9.4/main/pg_hba.conf
 
 }
 
-#' ### Check Current Version
-#' The following check verifies that the current version of TheSNPPit is set
-#+ check-cur-version-fun-def
-check_current_version () {
-  if [ -z "$CURR_VERSION" ]; then
-    error    "This is not a distribution of TheSNPpit for installation"
-    error    "or you are in the wrong directory."
-    err_exit "Unknown version. Can't read etc/VERSION"
-  else
-    ok "TheSNPpit Version $CURR_VERSION"
-  fi
-}
-
-#' ### Create Binary for TheSNPPit
-#' A small shell script that is used to start TheSNPPit is created
-#+ create-binary-fun-def
-create_binary_snppit () {
-  cat > $LOCALBIN/snppit <<EndOfSNPpitsh
-#!/bin/bash
-SNP_HOME=$SNP_HOME
-exec ${SNP_HOME}/bin/TheSNPpit "\$@"
-
-EndOfSNPpitsh
-  
-}
-
-#' ### Check for Multiple Postgres Installations
-#' It is verified that only one version of PG is installed
-#+ multiple-pg-check-fun
-multiple_pg_installations () {
-    info "checking for multiple postgresql versions"
-    COUNT=$(dpkg -l postgresql* | egrep 'ii ' |egrep "object-relational SQL database, version" |wc -l)
-    if [ $COUNT -gt 1 ]; then
-        error "You have several installations of the PostgreSQL server"
-        dpkg -l postgresql* | egrep 'ii ' |egrep "object-relational SQL database, version"
-        info "Only one postgresq installation is allowed"
-        info "BEWARE: you need a postgresql version >=9.3"
-        err_exit "deinstall unwanted postgresql, Sorry!"
-    fi
-}
 
 #' ### Obtain Postgres Version
 #' Get the version of the installed pg instance
@@ -308,7 +256,14 @@ init_pg_server () {
   # initialise a database for $OSUSER
   log_msg "init_pg_server" " * Init db ..."
   $INITDB -D $PGDATADIR -A trust -U $OSUSER
-  # adapt data directory in postgresql.conf
+}
+
+#' ### Start the PG db-server
+#' After initialisation the pg-server must be started
+#+ start-pg-server-fun
+start_pg_server () {
+  log_msg 'start_pg_server' ' * Starting pg-db-server ...'
+  $PGCTL -D $PGDATADIR -l $LOGFILE start
 }
 
 #' ### Move data items
@@ -400,12 +355,7 @@ configure_postgresql () {
 
     has_pg_access
     if [ $? -ne 0 ]; then
-        error "You have no right to access postgresql, wait ..."
-        # get_pg_access_for_root
-        # if [ $? -ne 0 ]; then
-        #     err_exit "Can't create root a postgresql superuser"
-        # fi
-        # ok "Access rights to root granted"
+        error "You have no right to access postgresql ..."
     fi
 
     DATA_DIR=$(echo "show data_directory" |su -l -s /bin/bash -c "psql --tuples-only --quiet --no-align" postgres)
@@ -413,8 +363,7 @@ configure_postgresql () {
         err_exit "DATA_DIR $DATA_DIR doesn't exist"
     fi
 
-    echo "select usename from pg_user where usename = '$ADMINUSER'" |psql postgres --tuples-only --quiet --no-align |gre
-p -q $ADMINUSER >/dev/null
+    echo "select usename from pg_user where usename = '$ADMINUSER'" | psql postgres --tuples-only --quiet --no-align | grep -q $ADMINUSER >/dev/null
     if [ $? -eq 0 ]; then
         ok "PostgreSQL ADMINUSER $ADMINUSER exists"
     else
@@ -427,10 +376,39 @@ p -q $ADMINUSER >/dev/null
     check_hba_conf
 }
 
+#' ## Check Status of TSP Binary
+#' Verify that tsp-binary can be run without error
+#+ check-tsp-bin-fun
+check_tsp_bin () {
+  log_msg 'check_tsp_bin' ' * Checking tsp-binary ...'
+  snppit --help >/dev/null
+  if [ $? -eq 0 ]; then
+     ok "snppit now seems to run ok"
+  else
+     error "There seems to be a problem running snppit"
+     exit 1
+  fi
+  
+}
 
+#' ## Run TSP-Tests
+#' TSP is tested with given tests
+#+ run-install-testdb-fun
+run_install_testdb () {
+  log_msg 'run_install_testdb' ' * Running tsp install_testdb ...'
+  
+  $SNP_HOME/bin/install_testdb
+  if [ $? -eq 0 ]; then
+    ok "===> Basic tests ok. Installation of TheSNPpit complete"
+  else
+    error "Basic tests failed."
+ fi
+  
+}
 
-
-#' ## Main Body of Script
+#' ##  #################################################################### ###
+#' ## 
+#' ##    Main Body of Script
 #' The main body of the script starts here.
 #+ start-msg, eval=FALSE
 start_msg
@@ -457,50 +435,61 @@ PGISREADY="/usr/lib/postgresql/$PG_ALLVERSION/bin/pg_isready"
 log_msg "$SCRIPT" "Initialise the postgres db instance ..."
 init_pg_server
 
-#' move data items from data directory to data target
-#+ mv-data-item
-if [ ! -z "$PGDATATRG" ]
-then
-  mv_data_item
-fi
+
+#' ### Start the PG-db-server
+#' After initialisation the db-server must be started
+#+ start-pg-db-server
+log_msg "$SCRIPT" ' * Starting pg server ...'
+start_pg_server
+
 
 #' ### Configure PG
 #' Configurationf of pg database
 #+ configure-pg
+log_msg "$SCRIPT" ' * Configure pg db ...'
 configure_postgresql
 
 
+#' move data items from data directory to data target
+#+ mv-data-item
+if [ ! -z "$PGDATATRG" ]
+then
+  log_msg "$SCRIPT" ' * Move data items ...'
+  mv_data_item
+fi
+
+
 #' check whether the pg db-server is running
+log_msg "$SCRIPT" ' * Check whether pg server is running ...'
 pg_server_running
 
-#' ### Perl Existence Check
-#' Call the function that verifies whether perl is installed
-#+ perl-check-call
-# check_perl
 
 #' ### Check snppit binary
-#' let's see, if snppit runs
-#+ snppit-check-calla
-# snppit --help >/dev/null
-# if [ $? -eq 0 ]; then
-#     ok "snppit now seems to run ok"
-# else
-#     error "There seems to be a problem running snppit"
-#     exit 1
-# fi
+#' Check whether the tsp-binary can be run without an error
+#+ check-tsp-bin
+log_msg "$SCRIPT" ' * Check TSP binary ...'
+check_tsp_bin
 
 
-# install TheSNPpit database:
-# install_thesnppit_db
+#' ### Run Basic Tsp-Tests
+#' Similarily to regression tests, tsp installation is tested
+#+ run-install-testdb
+log_msg "$SCRIPT" ' * Run tsp testdb commands ...'
+run_install_testdb
 
-# run basic tests:
-# info "===> Installation mainly done now. Running some basic tests now ..."
-# $SNP_HOME/bin/install_testdb
-# if [ $? -eq 0 ]; then
-#    ok "===> Basic tests ok. Installation of TheSNPpit complete"
-# else
-#    error "Basic tests failed."
-# fi
+
+#' ### Install TSP Test Database
+#' The test database for tsp is installed
+#+ install-tsp-test-db
+log_msg "$SCRIPT" ' * Install test DB ...'
+install_thesnppit_db $TEST_DB_NAME
+
+
+#' ### Install TSP Production Database
+#' The production database for tsp is installed
+#+ install-tsp-prod-db
+log_msg "$SCRIPT" ' * Install production DB ...'
+install_thesnppit_db $DB_NAME
 
 
 #' ## End of Script
