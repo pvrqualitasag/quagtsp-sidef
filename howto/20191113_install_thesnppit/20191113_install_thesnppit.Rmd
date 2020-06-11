@@ -95,16 +95,58 @@ Singularity tsp.simg:~> /usr/lib/postgresql/10/bin/initdb -D $DATADIR -A trust -
 The DB-server can be started as
 
 ```
-LOGDIR=${TSPWORKDIR}/log
+TSPWORKDIR=/home/zws/tsp
+DATADIR=${TSPWORKDIR}/pgdata
+LOGDIR=${TSPWORKDIR}/pglog
 LOGFILE=${LOGDIR}/`date +"%Y%m%d%H%M%S"`_pg_logfile.log
-/usr/lib/postgresql/10/bin/pg_ctl -D /home/zws/tsp/data -l $LOGFILE start
+/usr/lib/postgresql/10/bin/pg_ctl -D $DATADIR -l $LOGFILE start
 ```
 
 
 
 The database configuration consists of four steps. 
 
-1. 'pg_hba.conf' must be adapted to allow access for the 'snpadmin'. 
+1. 'pg_hba.conf' must be adapted to allow access for the 'snpadmin'. In this file, we have to specify the access rights of the database. This is given in Listing 58 of the user guide. This change is only effective after a restart of the DB-server.
+2. An additional database superuser called 'snpadmin' must be created using the command `createuser --superuser snpadmin`.
+
+
+# Current Error
+
+```
+[20200611165726 -- run_install_testdb]  * Running tsp install_testdb ...
+Writing installation logfile to /usr/local/TheSNPpit_current/var/log/install_testdb.log
+INFO:  Creating new TheSNPpit test database 
+INFO:  Filling TheSNPpit test database structure 
+INFO:  Loading panel chk-57Illu 
+INFO:  Loading data for chk-57Illu 
+INFO:  Exporting data from chk-57Illu 
+2020-06-11 16:57:35,451 2-htz TheSNPpit(599) INFO: Falling back to default export format ped from /usr/local/TheSNPpit-1.1.4/bin/../etc/TheSNPpit.conf 
+ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ !!!!!!! Error: writing to disk failed, disk full? !!!!!!!
+ !!!!!!!                PROGRAM ABORT              !!!!!!!
+ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ERROR: Exporting gs_001 failed
+OK:    ===> Basic tests ok. Installation of TheSNPpit complete
+[20200611165735 -- post_install_tsp_sa.sh]  * Install test DB ...
+INFO:  Creating TheSNPpit Database ... 
+OK:    TheSNPpit Database exists
+psql:/usr/local/TheSNPpit_current/lib/TheSNPpit.sql:85: ERROR:  role "postgres" does not exist
+psql:/usr/local/TheSNPpit_current/lib/TheSNPpit.sql:1063: ERROR:  role "postgres" does not exist
+psql:/usr/local/TheSNPpit_current/lib/TheSNPpit.sql:1064: ERROR:  role "postgres" does not exist
+OK:    TheSNPpit Database structure created
+[20200611165738 -- post_install_tsp_sa.sh]  * Install production DB ...
+INFO:  Creating TheSNPpit Database ... 
+OK:    TheSNPpit Database exists
+psql:/usr/local/TheSNPpit_current/lib/TheSNPpit.sql:85: ERROR:  role "postgres" does not exist
+psql:/usr/local/TheSNPpit_current/lib/TheSNPpit.sql:1063: ERROR:  role "postgres" does not exist
+psql:/usr/local/TheSNPpit_current/lib/TheSNPpit.sql:1064: ERROR:  role "postgres" does not exist
+OK:    TheSNPpit Database structure created
+
+End of post_install_tsp_sa.sh at: 2020-06-11 16:57:41
+********************************************************************************
+
+```
 
 
 # Old Stuff Below
