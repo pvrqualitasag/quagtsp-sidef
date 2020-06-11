@@ -48,9 +48,6 @@ MirrorURL: http://archive.ubuntu.com/ubuntu/
   chmod -R 755 /var/lib/postgresql/10/main
   chmod -R 777 /var/run/postgresql
   
-  # bind-point for db-working directory
-  mkdir -p /home/zws
-
   # dconf problem
   mkdir -p /run/user/501
   chmod -R 777 /run/user
@@ -66,6 +63,6 @@ MirrorURL: http://archive.ubuntu.com/ubuntu/
   echo '1-htz.quagzws.com' > /etc/hostname
 
 %environment
-  export PATH=${PATH}:/opt/openjdk/jdk8u222-b10/bin:/qualstorzws01/data_projekte/linuxBin
+  export PATH=${PATH}:/usr/local/TheSNPpit_current/bin:/opt/openjdk/jdk8u222-b10/bin:/qualstorzws01/data_projekte/linuxBin
   export TZ=$(cat /etc/timezone)
 
