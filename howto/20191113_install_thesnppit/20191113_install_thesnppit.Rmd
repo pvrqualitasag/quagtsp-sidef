@@ -57,6 +57,28 @@ In section 6.3 of the user guide a manual procedure is described. This manual in
 In Listing 57 of the user guide, the shell-commands to install the software dependencies of TSP are shown. In essence the dependencies of TSP are the 'gcc' compiler, the 'perl' interpreter and the 'postgresql' database together with additional libraries. The complete set of required software components are included into the singularity-recipe file that is used to build the singularity container image. 
 
 ## Database Configuration
+Before specifying the configuration of the database, we start the database-server from inside of the container.
+
+```
+# start a shell from the container image and bind /home/zws
+sudo singularity shell --writable --bind /home/zws tsp.simg
+```
+
+If the working directory does not exist, we have to initialise the working directory using the following command
+
+```
+TSPWORKDIR=/home/zws/tsp
+/home/zws/simg/quagtsp-sidef/bash/init_tsp_workdir.sh -w $TSPWORKDIR
+```
+
+
+```
+TSPWORKDIR=/home/zws/tsp
+DATADIR=${TSPWORKDIR}/data
+LOGDIR=${TSPWORKDIR}/log
+/usr/lib/postgresql/10/bin/initdb -D $DATADIR -A trust -U zws
+```
+
 The database configuration consists of four steps. 
 
 1. 'pg_hba.conf' must be adapted to allow access for the 'snpadmin'. 
