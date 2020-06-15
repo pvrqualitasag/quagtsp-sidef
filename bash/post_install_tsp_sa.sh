@@ -365,6 +365,22 @@ has_pg_access () {
     return $?
 }
 
+#' ### Check DB User
+#' Check whether a db user exists, if not it is created
+#+ check-create-db-user-fun
+check_create_db_admin () {
+  local l_DB_USER=$1
+  log_msg 'check_create_db_admin' " ** Check existence of dbuser: l_DB_USER ..."
+  echo "select usename from pg_user where usename = '$l_DB_USER'" | $PSQL postgres --tuples-only --quiet --no-align | grep -q $l_DB_USER >/dev/null
+  if [ $? -eq 0 ]; then
+        ok "PostgreSQL ADMINUSER $l_DB_USER exists"
+  else
+        $CREATEUSER --superuser $l_DB_USER
+        $PGCTL reload -D $DATA_DIR >/dev/null
+        ok "PostgreSQL ADMINUSER $l_DB_USER created"
+  fi
+}
+
 #' ### Check HBA Config
 #' Check configuration in pag_hba.conf
 #+ check-hba-conf-fun
@@ -414,17 +430,15 @@ configure_postgresql () {
     if [ ! -d $DATA_DIR ]; then
         err_exit "DATA_DIR $DATA_DIR doesn't exist"
     fi
-
-    echo "select usename from pg_user where usename = '$ADMINUSER'" | $PSQL postgres --tuples-only --quiet --no-align | grep -q $ADMINUSER >/dev/null
-    if [ $? -eq 0 ]; then
-        ok "PostgreSQL ADMINUSER $ADMINUSER exists"
-    else
-        $CREATEUSER --superuser $ADMINUSER
-        $PGCTL reload -D $DATA_DIR >/dev/null
-        ok "PostgreSQL ADMINUSER $ADMINUSER created"
-    fi
-
+    
+    # admin users
+    log_msg 'configure_postgresql' " * Check admin user: $ADMINUSER ..."
+    check_create_db_admin $ADMINUSER
+    log_msg 'configure_postgresql' " * Check admin user: postgres ..."
+    check_create_db_admin postgres
+    
     # save old pg_hba.conf and prepend a line:
+    log_msg 'configure_postgresql' ' * Check hba conf ...'
     check_hba_conf
 }
 
