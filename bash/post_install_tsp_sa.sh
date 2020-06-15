@@ -412,7 +412,7 @@ configure_postgresql () {
     if [ $? -eq 0 ]; then
         ok "PostgreSQL ADMINUSER $ADMINUSER exists"
     else
-        createuser --superuser $ADMINUSER
+        $CREATEUSER --superuser $ADMINUSER
         $PGCTL reload -D $DATA_DIR >/dev/null
         ok "PostgreSQL ADMINUSER $ADMINUSER created"
     fi
