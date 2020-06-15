@@ -341,7 +341,7 @@ mv_data_item () {
 #' Verification whether the pg DB-server is running or not
 #+ pg-db-server-check-fun
 pg_server_running () {
-  $PGISREADY -h localhost
+  $PGISREADY -h localhost -p $PG_PORT
   if [ $? -eq 0 ]
   then
     ok "PG db-server is running ..."
