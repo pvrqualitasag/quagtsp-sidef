@@ -218,7 +218,11 @@ EndOfSNPpitsh
   if [ ! -d "$VAR_DIR" ];then
     mkdir -p $VAR_DIR
   fi
-
+  # log directory
+  LOG_DIR=$VAR_DIR/log
+  if [ ! -d "$LOG_DIR" ];then
+    mkdir -p $LOG_DIR
+  fi  
   chmod -R 777 $VAR_DIR
   
 }
