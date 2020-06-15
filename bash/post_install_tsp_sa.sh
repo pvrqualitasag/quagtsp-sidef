@@ -463,7 +463,7 @@ run_install_testdb () {
 #+ check-tsp-workdir-fun
 check_tsp_workdir () {
   log_msg 'check_tsp_workdir' ' ** Checking existence of tsp-workdir ...'
-  if [ ! -d "$TSPWORKDIR" ]
+  if [ ! -d "$TSPWORKDIR" ] || [ ! -d "$PGLOGDIR" ]
   then
     log_msg 'check_tsp_workdir' ' ** Create tsp-workdir ...'
     $INSTALLDIR/init_tsp_workdir.sh
