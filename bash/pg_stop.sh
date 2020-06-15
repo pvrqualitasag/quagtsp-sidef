@@ -100,7 +100,7 @@ log_msg () {
 #' Get the version of the installed pg instance
 #+ get-pg-version-fun
 get_pg_version () {
-    info "collecting PG_version information"
+    log_msg 'get_pg_version' "collecting PG_version information ..."
     # we get here only after we have tested that there is only one
     # version of postgresql installed.
     # need PG_ALLVERSION  like 9.4 or 10
