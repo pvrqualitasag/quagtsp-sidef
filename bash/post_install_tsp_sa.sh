@@ -64,6 +64,7 @@ PGLOGDIR=${TSPWORKDIR}/pglog
 LOGFILE=$PGLOGDIR/`date +"%Y%m%d%H%M%S"`_postgres.log
 PGDATATRG='' # PGDATATRG=/qualstorzws01/data_tmp/tsp/pgdata
 PGLOGTRG=''  # PGLOGTRG=/qualstorzws01/data_tmp/tsp/pglog
+PG_PORT=''
 
 #' ## Functions
 #' The following definitions of general purpose functions are local to this script.
@@ -341,7 +342,13 @@ mv_data_item () {
 #' Verification whether the pg DB-server is running or not
 #+ pg-db-server-check-fun
 pg_server_running () {
-  $PGISREADY -h localhost -p $PG_PORT
+  if [ "$PG_PORT" != '' ]
+  then
+    $PGISREADY -h localhost -p $PG_PORT
+  else
+    $PGISREADY -h localhost 
+  fi
+  # check the return value
   if [ $? -eq 0 ]
   then
     ok "PG db-server is running ..."
