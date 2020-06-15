@@ -248,7 +248,6 @@ get_pg_version () {
     echo allversion_:$PG_ALLVERSION
 }
 
-
 #' ### Initialisation of the PG db-server
 #' All initialisation steps are done in this function
 #+ init-pg-server-fun
@@ -263,6 +262,36 @@ init_pg_server () {
     ok "Initdb successful ..."
   else
     err_exit "Initdb was not possible"
+  fi
+}
+
+#' ### Determine the port of pg
+#' The port specified in /etc/postgres/10/main/postgres.conf is used
+#+ get-pg-port-fun
+get_pg_port () {
+  PG_PORT=`grep '^port' $ETCPGCONF | cut -d '=' -f2 | cut -f1 | sed -e 's/ //'`
+}
+
+#' ### Setting the PG-Port
+#' Make sure that the pg-port is the same as in the global config.
+#+ set-pg-port-fun
+set_pg_port () {
+  # determine the pg-port from the global configuration
+  get_pg_port
+  # Set the same port in the local configuration
+  LOCALCONF=$PGDATADIR/postgresql.conf
+  # keep old version
+  mv ${LOCALCONF} ${LOCALCONF}.org
+  # if port setting is uncommented, comment it out
+  if [ `grep '^port' ${LOCALCONF}.org | wc -l` -eq 1 ]
+  then
+    cat ${LOCALCONF}.org | sed -e 's/#port/port/' > ${LOCALCONF}
+    mv ${LOCALCONF} ${LOCALCONF}.org
+  fi
+  # check whether port setting is commented out, then just add corrected port to the end
+  if [ `grep '^#port' ${LOCALCONF}.org | wc -l` -eq 1 ]
+  then
+    (cat ${LOCALCONF}.org;echo "port = $PG_PORT") > ${LOCALCONF}
   fi
 }
 
@@ -362,11 +391,12 @@ configure_postgresql () {
     # info "Running configure_postgresql ..."
     # as of version 10 no subversion: postgresql-10: use the 10
     # VERSION is now version.subversion as used in ETC_DIR
-    PG_CTL="/usr/lib/postgresql/${PG_ALLVERSION}/bin/pg_ctl"
     ETC_DIR="$PGDATADIR"
     if [ ! -d $ETC_DIR ]; then
         err_exit "ETC_DIR $ETC_DIR doesn't exist"
     fi
+    # setting the port
+    
     log_msg 'configure_postgresql' ' ** Checking pg-access ...'
     has_pg_access
     if [ $? -ne 0 ]; then
@@ -455,21 +485,38 @@ PSQL="/usr/lib/postgresql/$PG_ALLVERSION/bin/psql"
 CREATEDB="/usr/lib/postgresql/$PG_ALLVERSION/bin/createdb"
 PGCTL="/usr/lib/postgresql/$PG_ALLVERSION/bin/pg_ctl"
 PGISREADY="/usr/lib/postgresql/$PG_ALLVERSION/bin/pg_isready"
-
+ETCPGCONF="/etc/postgresql/$PG_ALLVERSION/main/postgresql.conf"
 
 #' ### Check Existence of TSP-Working-Dir
 #' Data-directory and Log-directory of pg are put into a working directory.
 #' The following function checks whether this directory exists or not
 #+ check-tsp-workdir
+log_msg "$SCRIPT" "Check whether TSP-workdir exist ..."
 check_tsp_workdir
 
 
-#' ### Configruation of PG
+#' ### Determine Port of PG
+#' The port used to start the PG-server must be the same as the port used by 
+#' clients such as psql.
+#+ get-pg-port
+log_msg "$SCRIPT" "Determine PG-Port ..."
+get_pg_port
+log_msg "$SCRIPT" "PG-Port: $PG_PORT ..."
+
+
+#' ### Initialisation of PG-DB
 #' The configuration steps of the pg database that require to be run as 
 #' user zws with its home directory available are done from here on.
 #+ init-pg-server-call
 log_msg "$SCRIPT" "Initialise the postgres db instance ..."
 init_pg_server
+
+
+#' ### Setting the port in the local configuration
+#' The pg-port must be set to be consistent
+#+ set-pg-port
+log_msg "$SCRIPT" "Set PG-Port ..."
+set_pg_port
 
 
 #' ### Start the PG-db-server
