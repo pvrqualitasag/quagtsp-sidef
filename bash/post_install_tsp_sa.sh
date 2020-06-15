@@ -378,7 +378,7 @@ check_hba_conf () {
         echo "host  all   snpadmin   ::1/128        trust" >>$ETC_DIR/pg_hba.conf
         cat $ETC_DIR/pg_hba.conf-saved-$NOW >>$ETC_DIR/pg_hba.conf
         info "Note: $ETC_DIR/pg_hba.conf saved to $ETC_DIR/pg_hba.conf-saved-$NOW and adapted"
-        $PG_CTL reload -D $DATA_DIR >/dev/null
+        $PGCTL reload -D $DATA_DIR >/dev/null
     fi
 }
 
@@ -413,7 +413,7 @@ configure_postgresql () {
         ok "PostgreSQL ADMINUSER $ADMINUSER exists"
     else
         createuser --superuser $ADMINUSER
-        $PG_CTL reload -D $DATA_DIR >/dev/null
+        $PGCTL reload -D $DATA_DIR >/dev/null
         ok "PostgreSQL ADMINUSER $ADMINUSER created"
     fi
 
