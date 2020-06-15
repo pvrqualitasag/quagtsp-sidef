@@ -370,7 +370,7 @@ has_pg_access () {
 #+ check-create-db-user-fun
 check_create_db_admin () {
   local l_DB_USER=$1
-  log_msg 'check_create_db_admin' " ** Check existence of dbuser: l_DB_USER ..."
+  log_msg 'check_create_db_admin' " ** Check existence of dbuser: $l_DB_USER ..."
   echo "select usename from pg_user where usename = '$l_DB_USER'" | $PSQL postgres --tuples-only --quiet --no-align | grep -q $l_DB_USER >/dev/null
   if [ $? -eq 0 ]; then
         ok "PostgreSQL ADMINUSER $l_DB_USER exists"
