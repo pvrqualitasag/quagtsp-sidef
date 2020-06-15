@@ -258,6 +258,12 @@ init_pg_server () {
   # initialise a database for $OSUSER
   log_msg "init_pg_server" " * Init db ..."
   $INITDB -D $PGDATADIR -A trust -U $OSUSER
+  if [ $? -eq 0 ]
+  then
+    ok "Initdb successful ..."
+  else
+    err_exit "Initdb was not possible"
+  fi
 }
 
 #' ### Start the PG db-server
@@ -266,6 +272,12 @@ init_pg_server () {
 start_pg_server () {
   log_msg 'start_pg_server' ' * Starting pg-db-server ...'
   $PGCTL -D $PGDATADIR -l $LOGFILE start
+  if [ $? -eq 0 ]
+  then
+    ok "PG server started successfully ..."
+  else
+    err_exit "Cannot start pg server ..."
+  fi
 }
 
 #' ### Move data items
