@@ -354,7 +354,7 @@ pg_server_running () {
 #' Check wheter we can access the database
 #+ has-pg-access-fun
 has_pg_access () {
-    psql -l >/dev/null 2>&1
+    $PSQL -l >/dev/null 2>&1
     return $?
 }
 
@@ -403,12 +403,12 @@ configure_postgresql () {
         error "You have no right to access postgresql ..."
     fi
 
-    DATA_DIR=$(echo "show data_directory" | psql --tuples-only --quiet --no-align postgres)
+    DATA_DIR=$(echo "show data_directory" | $PSQL --tuples-only --quiet --no-align postgres)
     if [ ! -d $DATA_DIR ]; then
         err_exit "DATA_DIR $DATA_DIR doesn't exist"
     fi
 
-    echo "select usename from pg_user where usename = '$ADMINUSER'" | psql postgres --tuples-only --quiet --no-align | grep -q $ADMINUSER >/dev/null
+    echo "select usename from pg_user where usename = '$ADMINUSER'" | $PSQL postgres --tuples-only --quiet --no-align | grep -q $ADMINUSER >/dev/null
     if [ $? -eq 0 ]; then
         ok "PostgreSQL ADMINUSER $ADMINUSER exists"
     else
