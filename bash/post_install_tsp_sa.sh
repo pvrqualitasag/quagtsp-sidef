@@ -196,7 +196,7 @@ install_thesnppit_db () {
     # does database exist?:
     $PSQL -l --tuples-only --quiet --no-align --field-separator=' '|awk '{print $1}' |grep "^${l_DB_NAME}$" >/dev/null
     if [ $? -eq 0 ]; then
-        ok "TheSNPpit Database $l_DB_NAME exists"
+        ok "TheSNPpit Database $l_DB_NAME already exists ..."
     else
         info "Creating Database $l_DB_NAME ..."
         $CREATEDB --encoding=$DB_ENCODING --owner=$ADMINUSER --no-password $l_DB_NAME
@@ -204,7 +204,7 @@ install_thesnppit_db () {
         # check again:
         $PSQL -l --tuples-only --quiet --no-align --field-separator=' '|awk '{print $1}' |grep "^${l_DB_NAME}$" >/dev/null
         if [ $? -eq 0 ]; then
-            ok "TheSNPpit Database $l_DB_NAME exists"
+            ok "TheSNPpit Database $l_DB_NAME now exists ..."
         fi
 
         # fill the newly created database with the structure:
