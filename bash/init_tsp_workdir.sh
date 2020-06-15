@@ -58,9 +58,10 @@ SERVER=`hostname`                          # put hostname of server in variable 
 usage () {
   local l_MSG=$1
   $ECHO "Usage Error: $l_MSG"
-  $ECHO "Usage: $SCRIPT -d <tsp_data_dir> -l <tsp_log_dir> -w <tsp_work_dir>"
-  $ECHO "  where -d <tsp_data_dir>  --  specify the data directory for the tsp database (optional)"
-  $ECHO "        -l <tsp_log_dir>   --  speicfy the log directory for the tsp database (optional)"
+  $ECHO "Usage: $SCRIPT -d <tsp_data_dir> -l <tsp_log_dir> -t <tsp_log_dir> -w <tsp_work_dir>"
+  $ECHO "  where -d <pg_data_dir>   --  specify the data directory for the pg database (optional)"
+  $ECHO "        -l <pg_log_dir>    --  specify the log directory for the pg database (optional)"
+  $ECHO "        -t <tsp_log_dir>   --  specify tsp log directory (optional)"
   $ECHO "        -w <tsp_work_dir>  --  specify the workdir for tsp (optional)"
   $ECHO ""
   exit 1
@@ -125,9 +126,10 @@ start_msg
 #' getopts. This is required to get my unrecognized option code to work.
 #+ getopts-parsing, eval=FALSE
 TSPWORKDIR=${HOME}/tsp
-DATADIR=""
-LOGDIR=""
-while getopts ":d:l:w:h" FLAG; do
+DATADIR=''
+LOGDIR=''
+TSPLOGDIR=''
+while getopts ":d:l:t:w:h" FLAG; do
   case $FLAG in
     h)
       usage "Help message for $SCRIPT"
@@ -137,6 +139,9 @@ while getopts ":d:l:w:h" FLAG; do
       ;;  
     l)
       LOGDIR=$OPTARG
+      ;;  
+    t)
+      TSPLOGDIR=$OPTARG
       ;;  
     w)
       TSPWORKDIR=$OPTARG
@@ -172,6 +177,10 @@ if [ "$LOGDIR" == "" ]
 then
   LOGDIR=${TSPWORKDIR}/pglog
 fi
+if [ "$TSPLOGDIR" == "" ]
+then
+  TSPLOGDIR=${TSPWORKDIR}/tsplog
+fi
 
 #' ## Create TSP Working Directory
 #' Create TSP working directory, if it does not exist
@@ -179,7 +188,7 @@ fi
 check_exist_dir_create $TSPWORKDIR
 check_exist_dir_create $DATADIR
 check_exist_dir_create $LOGDIR
-
+check_exist_dir_create $TSPLOGDIR
 
 #' ## End of Script
 #+ end-msg, eval=FALSE
