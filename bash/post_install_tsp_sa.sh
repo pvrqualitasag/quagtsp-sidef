@@ -483,6 +483,7 @@ get_pg_version
 INITDB="/usr/lib/postgresql/$PG_ALLVERSION/bin/initdb"
 PSQL="/usr/lib/postgresql/$PG_ALLVERSION/bin/psql"
 CREATEDB="/usr/lib/postgresql/$PG_ALLVERSION/bin/createdb"
+CREATEUSER="/usr/lib/postgresql/$PG_ALLVERSION/bin/createuser"
 PGCTL="/usr/lib/postgresql/$PG_ALLVERSION/bin/pg_ctl"
 PGISREADY="/usr/lib/postgresql/$PG_ALLVERSION/bin/pg_isready"
 ETCPGCONF="/etc/postgresql/$PG_ALLVERSION/main/postgresql.conf"
@@ -493,15 +494,6 @@ ETCPGCONF="/etc/postgresql/$PG_ALLVERSION/main/postgresql.conf"
 #+ check-tsp-workdir
 log_msg "$SCRIPT" "Check whether TSP-workdir exist ..."
 check_tsp_workdir
-
-
-#' ### Determine Port of PG
-#' The port used to start the PG-server must be the same as the port used by 
-#' clients such as psql.
-#+ get-pg-port
-log_msg "$SCRIPT" "Determine PG-Port ..."
-get_pg_port
-log_msg "$SCRIPT" "PG-Port: $PG_PORT ..."
 
 
 #' ### Initialisation of PG-DB
@@ -515,8 +507,8 @@ init_pg_server
 #' ### Setting the port in the local configuration
 #' The pg-port must be set to be consistent
 #+ set-pg-port
-log_msg "$SCRIPT" "Set PG-Port ..."
-set_pg_port
+#log_msg "$SCRIPT" "Set PG-Port ..."
+#set_pg_port
 
 
 #' ### Start the PG-db-server
