@@ -58,8 +58,9 @@ SERVER=`hostname`                          # put hostname of server in variable 
 usage () {
   local l_MSG=$1
   $ECHO "Usage Error: $l_MSG"
-  $ECHO "Usage: $SCRIPT -d <data_directory>"
+  $ECHO "Usage: $SCRIPT -d <data_directory> -l <log_directory>"
   $ECHO "  where -d <data_directory>  --  specify the data directory with which the pg-server is running (optional)"
+  $ECHO "        -l <log_directory>   --  specify the log directory (optional)"
   $ECHO ""
   exit 1
 }
@@ -135,7 +136,8 @@ start_msg
 #' getopts. This is required to get my unrecognized option code to work.
 #+ getopts-parsing, eval=FALSE
 DATADIR=/home/zws/tsp/pgdata
-while getopts ":d:h" FLAG; do
+LOGDIR=/home/zws/tsp/pglog
+while getopts ":d:l:h" FLAG; do
   case $FLAG in
     h)
       usage "Help message for $SCRIPT"
@@ -147,6 +149,13 @@ while getopts ":d:h" FLAG; do
         usage "$OPTARG isn't a directory"
       fi
       ;;
+    l)
+      if test -d $OPTARG; then
+        LOGDIR=$OPTARG
+      else
+        usage "$OPTARG isn't a directory"
+      fi
+      ;;    
     :)
       usage "-$OPTARG requires an argument"
       ;;
@@ -165,6 +174,9 @@ shift $((OPTIND-1))  #This tells getopts to move on to the next argument.
 if test "$DATADIR" == ""; then
   usage "-d <data_directory> not defined"
 fi
+if test "$LOGDIR" == ""; then
+  usage "-l <log_directory> not defined"
+fi
 
 #' ### Determine Version of PG
 #' The version of pg is determined
@@ -176,12 +188,12 @@ get_pg_version
 #' Commands used with pg are defined with variables
 #+ pg-var-def
 PGCTL="/usr/lib/postgresql/$PG_ALLVERSION/bin/pg_ctl"
-
+LOGFILE=$LOGDIR/`date +"%Y%m%d%H%M%S"`_postgres.log
 
 #' ## Starting the pg-server
 #' The pg-server is started with the pg_ctl command
 #+ pg-server-stop
-$PGCTL -D $DATADIR start
+$PGCTL -D $DATADIR -l $LOGFILE start
 
 
 
