@@ -1,0 +1,64 @@
+---
+title: "Install TheSNPpit in a Singularity Container"
+author: "Peter von Rohr"
+date: "6/16/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Disclaimer
+The installation procedure of TheSNPpit (TSP) in a singularity container using the tools developed in the repository quagtsp-sidef is documented. The strategy is described in '20191113_install_thesnppit.Rmd'. 
+
+
+## Installation Steps
+The following steps are required for installing the singularity container that contains TSP. 
+
+1. Preparation
+2. Pull the image
+3. Post-pull installation
+
+
+## Preparation
+### Repository Installation
+Before the singularity container image can be installed and started, the repository 'quagtsp-sidef' must be cloned to the machine where TSP should be running on. This can be done using the script 'clone_quagtsp_sidef.sh' specifying the target server and the username.
+
+```
+./bash/clone_quagtsp_sidef.sh -s niesen -u zws
+```
+
+The above clone-script can only be run once. After that all updates to 'quagtsp-sidef' must be done using 'update_quagtsp_sidef.sh'. 
+
+
+### TSP Work Directory
+Since TSP is running under an ordinary user-account, we have to create a local working directory. This is done on the remote server using the script 'init_tsp_workdir.sh'. 
+
+
+## Pull Image
+The original singularity container image was built based on a singularity recipe file. This recipe is deployed to Singularity Hub (SHUB -- https://singularity-hub.org/) via a connected github account. From SHUB, the singularity container image can be pulled using the 'singularity pull' command. The image pull can be done using the script 'pull_post_simg.sh'. The following parameters are used for the script.
+
+```
+/home/zws/simg/quagtsp-sidef/bash/pull_post_simg.sh -i sitsp -n `date +"%Y%m%d%H%M%S"`_quagtsp.img -s shub://pvrqualitasag/quagtsp-sidef -w /home/zws/simg/img/tsp
+```
+
+Once the container image is available on the local machine, we can start an instance of the container. This is done with the following command.
+
+```
+singularity instance start --bind /home/zws/tsp/tsplog:/usr/local/TheSNPpit-1.1.4/var/log,/home/zws/tsp/tspregtmp:/usr/local/TheSNPpit-1.1.4/regression/tmp,/qualstorzws01 /home/quagadmin/simg/img/tsp-sa/tsp.img sitsp
+```
+
+
+## Post-Pull Installation
+The configuration steps for the postgresql (pg) database and for TSP are done in a post-installation script. This script is executed as 
+
+```
+./simg/quagtsp_sidef/bash/post_install_tsp_sa.sh
+```
+
+As the last step, some demo-computations can be run to test the installation using the following script
+
+```
+/usr/local/TheSNPpit_current/bin/demo.bat
+```
