@@ -151,10 +151,10 @@ do
   log_msg "$SCRIPT" " * Should the following items be deleted [y/n] ..."
   # find `dirname $p` -name `basename $p` -print
   read answer
-  if [ "$answer" == "y"]
+  if [ "$answer" == "y" ]
   then
     log_msg "$SCRIPT" " * Deleting items matchin $p ..."
-    rm -rf $p
+    rm -rf "$p"
   fi
 done
 
