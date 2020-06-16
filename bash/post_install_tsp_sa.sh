@@ -62,8 +62,8 @@ TSPWORKDIR=/home/zws/tsp
 PGDATADIR=${TSPWORKDIR}/pgdata
 PGLOGDIR=${TSPWORKDIR}/pglog
 LOGFILE=$PGLOGDIR/`date +"%Y%m%d%H%M%S"`_postgres.log
-PGDATATRG='' # PGDATATRG=/qualstorzws01/data_tmp/tsp/pgdata
-PGLOGTRG=''  # PGLOGTRG=/qualstorzws01/data_tmp/tsp/pglog
+PGDATATRG=/qualstorzws01/data_tmp/tsp/pgdata  #PGDATATRG='' # 
+# PGLOGTRG=/qualstorzws01/data_tmp/tsp/pglog  #PGLOGTRG=''  # 
 PG_PORT=''
 
 #' ## Functions
@@ -274,7 +274,8 @@ get_pg_port () {
 }
 
 #' ### Setting the PG-Port
-#' Make sure that the pg-port is the same as in the global config.
+#' Make sure that the pg-port is the same as in the global config under 
+#' /etc/postgres/10/main/postgres.conf.
 #+ set-pg-port-fun
 set_pg_port () {
   # determine the pg-port from the global configuration
@@ -462,7 +463,6 @@ check_tsp_bin () {
 #+ run-install-testdb-fun
 run_install_testdb () {
   log_msg 'run_install_testdb' ' * Running tsp install_testdb ...'
-  
   $SNP_HOME/bin/install_testdb
   if [ $? -eq 0 ]; then
     ok "===> Basic tests ok. Installation of TheSNPpit complete"
@@ -532,6 +532,18 @@ init_pg_server
 #set_pg_port
 
 
+#' ### Moving Items in PGDATADIR
+#' Move data items from data directory to data target. This may be necessary, 
+#' because of space restrictions on the disk where ${HOME} of the OSUSER is 
+#' located.
+#+ mv-data-item
+if [ "$PGDATATRG" != "" ]
+then
+  log_msg "$SCRIPT" ' * Move data items ...'
+  mv_data_item
+fi
+
+
 #' ### Start the PG-db-server
 #' After initialisation the db-server must be started
 #+ start-pg-db-server
@@ -544,15 +556,6 @@ start_pg_server
 #+ configure-pg
 log_msg "$SCRIPT" ' * Configure pg db ...'
 configure_postgresql
-
-
-#' move data items from data directory to data target
-#+ mv-data-item
-if [ "$PGDATATRG" != "" ]
-then
-  log_msg "$SCRIPT" ' * Move data items ...'
-  mv_data_item
-fi
 
 
 #' check whether the pg db-server is running
