@@ -8,13 +8,21 @@
 #' Seamless setup process for tsp infrastructure.
 #'
 #' ## Description
-#' Initialisation of working directory for the tsp database. The working directory contains subdirectories for data and logfiles.
+#' Initialisation of working directory for the pg-database used by TSP. The working 
+#' directory contains subdirectories for pg-data, pg-logfiles, tsp-logs and output 
+#' of the regression tests of TSP.
 #'
 #' ## Details
-#' Before creating an instance of a tsp-singularity-container, we have to prepare the local directory infrastructure for the tsp-pg-database.
+#' Before creating an instance of a tsp-singularity-container, we have to prepare 
+#' the local directory infrastructure for the tsp-pg-database and for the output 
+#' created by TSP during the installation. Using the option -m <mv-trg-dir>, a 
+#' target directory can be specified where the pg-data items will be moved. This 
+#' can be used when the disk space of the local user is too small to capture 
+#' the complete database.
 #'
 #' ## Example
 #' ./init_tsp_workdir.sh -w ${HOME}/tsp
+#' ./init_tsp_workdir.sh -f # using defaults
 #'
 #' ## Set Directives
 #' General behavior of the script is driven by the following settings
