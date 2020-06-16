@@ -168,13 +168,6 @@ done
 
 shift $((OPTIND-1))  #This tells getopts to move on to the next argument.
 
-#' ## Checks for Command Line Arguments
-#' The following statements are used to check whether required arguments
-#' have been assigned with a non-empty value
-#+ argument-test, eval=FALSE
-if test "$TSPWORKDIR" == ""; then
-  usage "-w <tsp_work_directory> not defined"
-fi
 
 #' ## Update Directories
 #' If the data directory and the log directory were not specified, then 
