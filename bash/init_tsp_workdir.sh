@@ -58,9 +58,10 @@ SERVER=`hostname`                          # put hostname of server in variable 
 usage () {
   local l_MSG=$1
   $ECHO "Usage Error: $l_MSG"
-  $ECHO "Usage: $SCRIPT -d <tsp_data_dir> -l <tsp_log_dir> -t <tsp_log_dir> -w <tsp_work_dir>"
+  $ECHO "Usage: $SCRIPT -d <tsp_data_dir> -l <tsp_log_dir> -r <tsp_reg_temp> -t <tsp_log_dir> -w <tsp_work_dir>"
   $ECHO "  where -d <pg_data_dir>   --  specify the data directory for the pg database (optional)"
   $ECHO "        -l <pg_log_dir>    --  specify the log directory for the pg database (optional)"
+  $ECHO "        -r <tsp_reg_temp>  --  specify the temporary regression directory (optional)"
   $ECHO "        -t <tsp_log_dir>   --  specify tsp log directory (optional)"
   $ECHO "        -w <tsp_work_dir>  --  specify the workdir for tsp (optional)"
   $ECHO ""
@@ -129,7 +130,8 @@ TSPWORKDIR=${HOME}/tsp
 DATADIR=''
 LOGDIR=''
 TSPLOGDIR=''
-while getopts ":d:l:t:w:h" FLAG; do
+TSPREGTMP=''
+while getopts ":d:l:r:t:w:h" FLAG; do
   case $FLAG in
     h)
       usage "Help message for $SCRIPT"
@@ -140,6 +142,9 @@ while getopts ":d:l:t:w:h" FLAG; do
     l)
       LOGDIR=$OPTARG
       ;;  
+    r)
+      TSPREGTMP=$OPTARG
+      ;;
     t)
       TSPLOGDIR=$OPTARG
       ;;  
@@ -181,6 +186,10 @@ if [ "$TSPLOGDIR" == "" ]
 then
   TSPLOGDIR=${TSPWORKDIR}/tsplog
 fi
+if [ "$TSPREGTMP" == "" ]
+then
+  TSPREGTMP=${TSPWORKDIR}/tspregtmp
+fi  
 
 #' ## Create TSP Working Directory
 #' Create TSP working directory, if it does not exist
@@ -189,6 +198,7 @@ check_exist_dir_create $TSPWORKDIR
 check_exist_dir_create $DATADIR
 check_exist_dir_create $LOGDIR
 check_exist_dir_create $TSPLOGDIR
+check_exist_dir_create $TSPREGTMP
 
 #' ## End of Script
 #+ end-msg, eval=FALSE
