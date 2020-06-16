@@ -58,12 +58,13 @@ SERVER=`hostname`                          # put hostname of server in variable 
 usage () {
   local l_MSG=$1
   $ECHO "Usage Error: $l_MSG"
-  $ECHO "Usage: $SCRIPT -d <tsp_data_dir> -l <tsp_log_dir> -r <tsp_reg_temp> -t <tsp_log_dir> -w <tsp_work_dir>"
+  $ECHO "Usage: $SCRIPT -d <tsp_data_dir> -l <tsp_log_dir> -r <tsp_reg_temp> -t <tsp_log_dir> -w <tsp_work_dir> -f"
   $ECHO "  where -d <pg_data_dir>   --  specify the data directory for the pg database (optional)"
   $ECHO "        -l <pg_log_dir>    --  specify the log directory for the pg database (optional)"
   $ECHO "        -r <tsp_reg_temp>  --  specify the temporary regression directory (optional)"
   $ECHO "        -t <tsp_log_dir>   --  specify tsp log directory (optional)"
   $ECHO "        -w <tsp_work_dir>  --  specify the workdir for tsp (optional)"
+  $ECHO "        -f                 --  use the defaults specified in the script (optional)"
   $ECHO ""
   exit 1
 }
@@ -126,12 +127,14 @@ start_msg
 #' Notice there is no ":" after "h". The leading ":" suppresses error messages from
 #' getopts. This is required to get my unrecognized option code to work.
 #+ getopts-parsing, eval=FALSE
-TSPWORKDIR=${HOME}/tsp
+TSPWORKDIRDEFAULT=${HOME}/tsp
+USEDEFAULTS='FALSE'
+TSPWORKDIR=''
 DATADIR=''
 LOGDIR=''
 TSPLOGDIR=''
 TSPREGTMP=''
-while getopts ":d:l:r:t:w:h" FLAG; do
+while getopts ":d:l:r:t:w:fh" FLAG; do
   case $FLAG in
     h)
       usage "Help message for $SCRIPT"
@@ -139,6 +142,9 @@ while getopts ":d:l:r:t:w:h" FLAG; do
     d)
       DATADIR=$OPTARG
       ;;  
+    f)
+      USEDEFAULTS='TRUE'
+      ;;
     l)
       LOGDIR=$OPTARG
       ;;  
@@ -174,31 +180,54 @@ fi
 #' If the data directory and the log directory were not specified, then 
 #' define them based on the TSPWORKDIR
 #+ update-dir
-if [ "$DATADIR" == "" ]
+if [ "$USEDEFAULTS" == 'TRUE' ]
 then
-  DATADIR=${TSPWORKDIR}/pgdata
+  if [ "$TSPWORKDIR" == "" ]
+  then
+    TSPWORKDIR=${TSPWORKDIRDEFAULT}
+  fi
+  if [ "$DATADIR" == "" ]
+  then
+    DATADIR=${TSPWORKDIR}/pgdata
+  fi
+  if [ "$LOGDIR" == "" ]
+  then
+    LOGDIR=${TSPWORKDIR}/pglog
+  fi
+  if [ "$TSPLOGDIR" == "" ]
+  then
+    TSPLOGDIR=${TSPWORKDIR}/tsplog
+  fi
+  if [ "$TSPREGTMP" == "" ]
+  then
+    TSPREGTMP=${TSPWORKDIR}/tspregtmp
+  fi  
 fi
-if [ "$LOGDIR" == "" ]
-then
-  LOGDIR=${TSPWORKDIR}/pglog
-fi
-if [ "$TSPLOGDIR" == "" ]
-then
-  TSPLOGDIR=${TSPWORKDIR}/tsplog
-fi
-if [ "$TSPREGTMP" == "" ]
-then
-  TSPREGTMP=${TSPWORKDIR}/tspregtmp
-fi  
 
 #' ## Create TSP Working Directory
 #' Create TSP working directory, if it does not exist
 #+ check-create-tsp-workdir
-check_exist_dir_create $TSPWORKDIR
-check_exist_dir_create $DATADIR
-check_exist_dir_create $LOGDIR
-check_exist_dir_create $TSPLOGDIR
-check_exist_dir_create $TSPREGTMP
+if [ "$TSPWORKDIR" != "" ]
+then
+  check_exist_dir_create $TSPWORKDIR
+fi
+if [ "$DATADIR" != "" ]
+then
+  check_exist_dir_create $DATADIR
+fi  
+if [ "$LOGDIR" != "" ]
+then
+  check_exist_dir_create $LOGDIR
+fi  
+if [ "$TSPLOGDIR" != "" ]
+then
+  check_exist_dir_create $TSPLOGDIR
+fi  
+if [ "$TSPREGTMP" != "" ]
+then
+  check_exist_dir_create $TSPREGTMP
+fi
+
 
 #' ## End of Script
 #+ end-msg, eval=FALSE
