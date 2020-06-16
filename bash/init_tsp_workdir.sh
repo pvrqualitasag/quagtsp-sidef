@@ -61,6 +61,7 @@ usage () {
   $ECHO "Usage: $SCRIPT -d <tsp_data_dir> -l <tsp_log_dir> -r <tsp_reg_temp> -t <tsp_log_dir> -w <tsp_work_dir> -f"
   $ECHO "  where -d <pg_data_dir>   --  specify the data directory for the pg database (optional)"
   $ECHO "        -l <pg_log_dir>    --  specify the log directory for the pg database (optional)"
+  $ECHO "        -m <mv_trg_dir>    --  specify the move-items target directory (optional)"
   $ECHO "        -r <tsp_reg_temp>  --  specify the temporary regression directory (optional)"
   $ECHO "        -t <tsp_log_dir>   --  specify tsp log directory (optional)"
   $ECHO "        -w <tsp_work_dir>  --  specify the workdir for tsp (optional)"
@@ -134,7 +135,8 @@ DATADIR=''
 LOGDIR=''
 TSPLOGDIR=''
 TSPREGTMP=''
-while getopts ":d:l:r:t:w:fh" FLAG; do
+MVTRGDIR=''
+while getopts ":d:l:m:r:t:w:fh" FLAG; do
   case $FLAG in
     h)
       usage "Help message for $SCRIPT"
@@ -147,6 +149,9 @@ while getopts ":d:l:r:t:w:fh" FLAG; do
       ;;
     l)
       LOGDIR=$OPTARG
+      ;;  
+    m)
+      MVTRGDIR=$OPTARG
       ;;  
     r)
       TSPREGTMP=$OPTARG
@@ -219,6 +224,10 @@ fi
 if [ "$TSPREGTMP" != "" ]
 then
   check_exist_dir_create $TSPREGTMP
+fi
+if [ "$MVTRGDIR" != "" ]
+then
+  check_exist_dir_create $MVTRGDIR
 fi
 
 
