@@ -604,6 +604,12 @@ log_msg "$SCRIPT" ' * Install production DB ...'
 install_thesnppit_db $DB_NAME
 
 
+#' ### Run Demo
+#' Output the hint to the demos to be run
+#+ demo-hint
+log_msg "$SCRIPT" ' * You can now run the demo: /usr/local/TheSNPpit_current/bin/demo.bat ...'
+
+
 #' ## End of Script
 #+ end-msg, eval=FALSE
 end_msg
