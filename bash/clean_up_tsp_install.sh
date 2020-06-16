@@ -148,14 +148,17 @@ fi
 for p in "${patlist[@]}"
 do
   log_msg "$SCRIPT" " * Cleanup pattern: $p ..."
-  log_msg "$SCRIPT" " * Should the following items be deleted [y/n] ..."
-  # find `dirname $p` -name `basename $p` -print
-  read answer
-  if [ "$answer" == "y" ]
-  then
-    log_msg "$SCRIPT" " * Deleting items matchin $p ..."
-    eval "rm -rf \"$p\""
-  fi
+  # loop over matches for $p
+  for f in `ls -1 $p`
+  do
+    log_msg "$SCRIPT" " * Should $f be deleted [y/n] ..."
+    read answer
+    if [ "$answer" == "y" ]
+    then
+      log_msg "$SCRIPT" " * Deleting $f ..."
+      rm -rf "$f"
+    fi
+  done  
 done
 
 
