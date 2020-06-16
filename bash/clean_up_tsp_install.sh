@@ -132,7 +132,7 @@ shift $((OPTIND-1))  #This tells getopts to move on to the next argument.
 #' The following list of patterns is used to cleanup
 if [ "$PATSTRING" == "" ]
 then
-  patlist=('gs_001.ss_001.is_001.*' 'SNPpit-*.log' 'wk0125.*')
+  patlist=("gs_001.ss_001.is_001.*" "SNPpit-*.log" "wk0125.*")
 else
   patlist=()
   for f in `echo $PATSTRING | sed -e "s/,/\n/"`
@@ -154,7 +154,7 @@ do
   if [ "$answer" == "y" ]
   then
     log_msg "$SCRIPT" " * Deleting items matchin $p ..."
-    rm -rf "$p"
+    eval "rm -rf \"$p\""
   fi
 done
 
