@@ -149,7 +149,7 @@ for p in "${patlist[@]}"
 do
   log_msg "$SCRIPT" " * Cleanup pattern: $p ..."
   log_msg "$SCRIPT" " * Should the following items be deleted [y/n] ..."
-  find `dirname $p` -name `basename $p` -print
+  # find `dirname $p` -name `basename $p` -print
   read answer
   if [ "$answer" == "y"]
   then
