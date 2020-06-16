@@ -312,23 +312,30 @@ start_pg_server () {
 }
 
 #' ### Move data items
-#' Data items are moved from original data directory to new data target
+#' Data items are moved from original data directory to new data target. This 
+#' requires the pg-db-server to be stopped before the move and then restarted.
 #+ mv-data-item-fun
 mv_data_item () {
+  log_msg mv_data_item ' ** Moving data items ...'
+  # stop the db-server
+  log_msg mv_data_item ' ** Stopping db-server ...'
+  $PGSTOP
+  sleep 2
+  
   # check whether target data dir exists
   check_non_empty_dir_fail_create_non_exist $PGDATATRG
   # move all files in $PGDATADIR to
   log_msg mv_data_item " * Create list of items ..."
-  l_pglist=()
-  ls -1 $PGDATADIR | while read e;
+  pglist=()
+  for e in `ls -1 $PGDATADIR`
   do
     log_msg mv_data_item "   + Add item $e to list ..."
-    l_pglist+=( $e )
+    pglist=("${pglist[@]}" "$e")
   done
   cur_wd=`pwd`
   cd $PGDATADIR
   log_msg mv_data_item " * Move items from data dir to data trg ..."
-  for f in "${l_pglist[@]}";
+  for f in "${pglist[@]}";
   do
     log_msg mv_data_item "   + Moving item $f ..."    
     mv $f $PGDATATRG
@@ -337,6 +344,10 @@ mv_data_item () {
     sleep 2;
   done
   cd $cur_wd
+  # start the db-server
+  log_msg mv_data_item ' ** Start db-server ...'
+  $PGSTART
+  sleep 2
 }
 
 #' ### Check Status Of DB Server
@@ -508,6 +519,8 @@ CREATEUSER="/usr/lib/postgresql/$PG_ALLVERSION/bin/createuser"
 PGCTL="/usr/lib/postgresql/$PG_ALLVERSION/bin/pg_ctl"
 PGISREADY="/usr/lib/postgresql/$PG_ALLVERSION/bin/pg_isready"
 ETCPGCONF="/etc/postgresql/$PG_ALLVERSION/main/postgresql.conf"
+PGSTART='/home/zws/simg/quagtsp-sidef/bash/pg_start.sh'
+PGSTOP='/home/zws/simg/quagtsp-sidef/bash/pg_stop.sh'
 
 #' ### Check Existence of TSP-Working-Dir
 #' Data-directory and Log-directory of pg are put into a working directory.
@@ -532,18 +545,6 @@ init_pg_server
 #set_pg_port
 
 
-#' ### Moving Items in PGDATADIR
-#' Move data items from data directory to data target. This may be necessary, 
-#' because of space restrictions on the disk where ${HOME} of the OSUSER is 
-#' located.
-#+ mv-data-item
-if [ "$PGDATATRG" != "" ]
-then
-  log_msg "$SCRIPT" ' * Move data items ...'
-  mv_data_item
-fi
-
-
 #' ### Start the PG-db-server
 #' After initialisation the db-server must be started
 #+ start-pg-db-server
@@ -556,6 +557,18 @@ start_pg_server
 #+ configure-pg
 log_msg "$SCRIPT" ' * Configure pg db ...'
 configure_postgresql
+
+
+#' ### Moving Items in PGDATADIR
+#' Move data items from data directory to data target. This may be necessary, 
+#' because of space restrictions on the disk where ${HOME} of the OSUSER is 
+#' located.
+#+ mv-data-item
+if [ "$PGDATATRG" != "" ]
+then
+  log_msg "$SCRIPT" ' * Move data items ...'
+  mv_data_item
+fi
 
 
 #' check whether the pg db-server is running
