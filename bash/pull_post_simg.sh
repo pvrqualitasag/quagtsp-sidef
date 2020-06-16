@@ -25,7 +25,7 @@
 #' The following call does just a pull of a new container image
 #' 
 #' $ cd /home/zws/simg/img 
-#' $  ./pull_post_simg.sh -i sitsp -n `date +"%Y%m%d"`_quagtsp.simg -s shub://pvrqualitasag/quagtsp-sidef
+#' $  ./pull_post_simg.sh -i sitsp -n `date +"%Y%m%d"`_quagtsp.simg -s shub://pvrqualitasag/quagtsp-sidef -w /home/zws/simg/img/tsp
 #'
 #+ bash-env-setting, eval=FALSE
 set -o errexit    # exit immediately, if single command exits with non-zero status
