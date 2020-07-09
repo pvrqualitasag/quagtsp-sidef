@@ -134,7 +134,7 @@ start_msg
 #' Notice there is no ":" after "h". The leading ":" suppresses error messages from
 #' getopts. This is required to get my unrecognized option code to work.
 #+ getopts-parsing, eval=FALSE
-DATADIR=/home/zws/tsp/pgdata
+DATADIR=${HOME}/tsp/pgdata
 while getopts ":d:h" FLAG; do
   case $FLAG in
     h)

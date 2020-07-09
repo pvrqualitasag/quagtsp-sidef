@@ -106,7 +106,8 @@ log_msg () {
 #+ update-pkg-fun
 clone_repo () {
   local l_SERVER=$1
-  log_msg 'clone_repo' "Running update on $l_SERVER"
+  log_msg 'clone_repo' " ** Cloning repo on $l_SERVER ..."
+  log_msg 'clone_repo' " ** Repourl: $REPOURL ..."
   SSHCMD="QSRCDIR=$REPOROOT; 
 QHTZDIR=$REPOPATH;"' 
 if [ ! -d "$QSRCDIR" ];then mkdir -p ${QSRCDIR};fi;'
@@ -114,17 +115,18 @@ if [ ! -d "$QSRCDIR" ];then mkdir -p ${QSRCDIR};fi;'
    if [ "$REFERENCE" != "" ]
    then
      SSHCMD="${SSHCMD}"'if [ ! -d "$QHTZDIR" ];then 
-   git -C "$QSRCDIR" clone https://github.com/pvrqualitasag/quagtsp-sidef.git -b '"$REFERENCE"';
+   git -C "$QSRCDIR" clone '"$REPOURL"' -b '"$REFERENCE"';
  else 
    echo "$QHTZDIR already exists, run updated_quagzws_htz.sh";
  fi'
    else
      SSHCMD="${SSHCMD}"'if [ ! -d "$QHTZDIR" ];then 
-   git -C "$QSRCDIR" clone https://github.com/pvrqualitasag/quagtsp-sidef.git; 
+   git -C "$QSRCDIR" clone '"$REPOURL"'; 
  else 
    echo "$QHTZDIR already exists, run updated_quagzws_htz.sh";
  fi'
    fi
+  log_msg 'clone_repo' " ** ssh-cmd: $SSHCMD ..."
   ssh $REMOTEUSER@$l_SERVER $SSHCMD
 }
 
@@ -144,13 +146,13 @@ local_clone_repo () {
   if [ "$REFERENCE" != "" ]
   then
     if [ ! -d "$QHTZDIR" ]; then
-      git -C "$QSRCDIR" clone https://github.com/pvrqualitasag/quagtsp-sidef.git -b "$REFERENCE"
+      git -C "$QSRCDIR" clone $REPOURL -b "$REFERENCE"
     else \
       echo "$QHTZDIR already exists, run updated_quagzws_htz.sh"
     fi
   else
     if [ ! -d "$QHTZDIR" ]; then
-      git -C "$QSRCDIR" clone https://github.com/pvrqualitasag/quagtsp-sidef.git
+      git -C "$QSRCDIR" clone $REPOURL
     else 
       echo "$QHTZDIR already exists, run updated_quagzws_htz.sh"
     fi
@@ -199,8 +201,10 @@ shift $((OPTIND-1))  #This tells getopts to move on to the next argument.
 #' ## Define User-dependent Variables
 #' Repository root and repository path depend on the user, hence they are 
 #' specified after commandline parsing
+REPONAME='quagtsp_sidef'
 REPOROOT=/home/${REMOTEUSER}/simg
-REPOPATH=$REPOROOT/quagtsp_sidef
+REPOPATH=$REPOROOT/$REPONAME
+REPOURL=https://github.com/pvrqualitasag/${REPONAME}.git
 
 
 #' ## Run Updates

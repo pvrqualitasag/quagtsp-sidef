@@ -114,7 +114,7 @@ git fetch;
 git checkout origin/'"$REFERENCE"
   else
     SSHCMD="QTSPDIR=$REPOPATH;"' \
-git -C "$QTSPDIR" pull https://github.com/pvrqualitasag/quagtsp-sidef.git'
+git -C "$QTSPDIR" pull '"$REPOURL"
   fi
   log_msg 'pull_repo' " ** SSHCMD: $SSHCMD"
   ssh $REMOTEUSER@$l_SERVER "$SSHCMD"
@@ -133,9 +133,9 @@ local_pull_repo () {
   # check whether we are inside of a singularity container
   if [ "$REFERENCE" != "" ]
   then
-    git -C "$QTSPDIR" pull https://github.com/pvrqualitasag/quagtsp-sidef.git -b "$REFERENCE"
+    git -C "$QTSPDIR" pull "$REPOURL" -b "$REFERENCE"
   else
-    git -C "$QTSPDIR" pull https://github.com/pvrqualitasag/quagtsp-sidef.git
+    git -C "$QTSPDIR" pull "$REPOURL"
   fi  
 }
 
@@ -181,8 +181,10 @@ shift $((OPTIND-1))  #This tells getopts to move on to the next argument.
 #' ## Define User-dependent Variables
 #' Repository root and repository path depend on the user, hence they are 
 #' specified after commandline parsing
-REPOROOT=/home/$REMOTEUSER/simg
-REPOPATH=$REPOROOT/quagtsp-sidef
+REPONAME='quagtsp-sidef'
+REPOROOT=/home/${REMOTEUSER}/simg
+REPOPATH=$REPOROOT/$REPONAME
+REPOURL="https://github.com/pvrqualitasag/${REPONAME}.git"
 
 
 #' ## Run Updates

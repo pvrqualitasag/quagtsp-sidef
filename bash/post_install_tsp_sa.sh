@@ -61,7 +61,7 @@ TEST_DB_NAME=TheSNPpit_test
 TSPWORKDIR=/home/zws/tsp
 PGDATADIR=${TSPWORKDIR}/pgdata
 PGLOGDIR=${TSPWORKDIR}/pglog
-LOGFILE=$PGLOGDIR/`date +"%Y%m%d%H%M%S"`_postgres.log
+PGLOGFILE=$PGLOGDIR/`date +"%Y%m%d%H%M%S"`_postgres.log
 PGDATATRG=/qualstorzws01/data_tmp/tsp/pgdata  #PGDATATRG='' # 
 # PGLOGTRG=/qualstorzws01/data_tmp/tsp/pglog  #PGLOGTRG=''  # 
 PG_PORT=''
@@ -127,6 +127,10 @@ check_exist_dir_fail () {
   fi  
 }
 
+#' ### Check Directory Existence
+#' The passed directory is created, if it does not exist. If it exists and is 
+#' non-empty the script stops with an error
+#+ check-non-empty-dir-fail-create-non-exist-fun
 check_non_empty_dir_fail_create_non_exist () {
   local l_check_dir=$1
   if [ -d $l_check_dir ]
@@ -213,10 +217,7 @@ install_thesnppit_db () {
             ok "TheSNPpit Database structure created"
         fi
     fi
-
-
 }
-
 
 #' ### Obtain Postgres Version
 #' Get the version of the installed pg instance
@@ -302,7 +303,7 @@ set_pg_port () {
 #+ start-pg-server-fun
 start_pg_server () {
   log_msg 'start_pg_server' ' * Starting pg-db-server ...'
-  $PGCTL -D $PGDATADIR -l $LOGFILE start
+  $PGCTL -D $PGDATADIR -l $PGLOGFILE start
   if [ $? -eq 0 ]
   then
     ok "PG server started successfully ..."
@@ -491,7 +492,7 @@ check_tsp_workdir () {
   if [ ! -d "$TSPWORKDIR" ] || [ ! -d "$PGLOGDIR" ]
   then
     log_msg 'check_tsp_workdir' ' ** Create tsp-workdir ...'
-    $INSTALLDIR/init_tsp_workdir.sh
+    $INSTALLDIR/init_tsp_workdir.sh -f
   else
     log_msg 'check_tsp_workdir' ' ** TSP-Workdir found ...'
   fi
@@ -519,8 +520,8 @@ CREATEUSER="/usr/lib/postgresql/$PG_ALLVERSION/bin/createuser"
 PGCTL="/usr/lib/postgresql/$PG_ALLVERSION/bin/pg_ctl"
 PGISREADY="/usr/lib/postgresql/$PG_ALLVERSION/bin/pg_isready"
 ETCPGCONF="/etc/postgresql/$PG_ALLVERSION/main/postgresql.conf"
-PGSTART='/home/zws/simg/quagtsp-sidef/bash/pg_start.sh'
-PGSTOP='/home/zws/simg/quagtsp-sidef/bash/pg_stop.sh'
+PGSTART="$INSTALLDIR/pg_start.sh"
+PGSTOP="$INSTALLDIR/pg_stop.sh"
 
 #' ### Check Existence of TSP-Working-Dir
 #' Data-directory and Log-directory of pg are put into a working directory.
