@@ -62,3 +62,12 @@ As the last step, some demo-computations can be run to test the installation usi
 ```
 /usr/local/TheSNPpit_current/bin/demo.bat
 ```
+
+
+## Use Case
+The following command can be used to run `snppit` from all servers 
+
+```
+ssh zws@niesen "singularity exec instance://sitsp snppit -h"
+```
+
