@@ -62,10 +62,8 @@ TSPWORKDIR=/home/zws/tsp
 PGDATADIR=${TSPWORKDIR}/pgdata
 PGLOGDIR=${TSPWORKDIR}/pglog
 PGLOGFILE=$PGLOGDIR/`date +"%Y%m%d%H%M%S"`_postgres.log
-# PGDATATRG=/qualstorzws01/data_tmp/tsp/pgdata  #PGDATATRG='' # 
 PGDATATRG=/qualstorzws01/data_archiv/tsp/pgdata  #PGDATATRG='' # 
-# PGLOGTRG=/qualstorzws01/data_tmp/tsp/pglog  #PGLOGTRG=''  # 
-PG_PORT=''
+PG_PORT='5433'
 
 #' ## Functions
 #' The following definitions of general purpose functions are local to this script.
@@ -544,7 +542,7 @@ init_pg_server
 #' The pg-port must be set to be consistent
 #+ set-pg-port
 #log_msg "$SCRIPT" "Set PG-Port ..."
-#set_pg_port
+set_pg_port
 
 
 #' ### Start the PG-db-server
