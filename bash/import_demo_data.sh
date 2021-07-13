@@ -193,6 +193,7 @@ install_thesnppit_db
 #' ## SNP-Map Load
 #' load panel map data from file picken.map and give it the name chk-57Illu
 #+ load-map
+log_msg $SCRIPT " * Load panel map from file ..."
 ID="$SNP_HOME/regression/input"
 snppit  -T $DEMODB -I panel -f ped -p chk-57Illu -i $ID/picken.map --skipheader
 
@@ -200,24 +201,28 @@ snppit  -T $DEMODB -I panel -f ped -p chk-57Illu -i $ID/picken.map --skipheader
 #' ## SNP-Data Load
 #' load SNP data for the panel chk-57Illu from file picken.ped
 #+ load-snp-data
+log_msg $SCRIPT " * Load SNP data for panel from ped file ..."
 snppit -T $DEMODB -I data  -f ped -p chk-57Illu -i $ID/picken.ped
 
 
 #' ## Panel map data
 #' load panel map data from 500000 panel
 #+ load-panel-map
+log_msg $SCRIPT " * Load panel map data from 500000 panel ..."
 snppit -T $DEMODB -I panel -f ped -p 500000 -i $ID/00500000-00010.map
 
 
 #' ## SNP-Data from Panel
 #' load panel SNP data from 500000 panel 
 #+ load-snp-panel
+log_msg $SCRIPT " * Load SNP data for 500000 panel ..."
 snppit -T $DEMODB -I data -f ped -p 500000 -i $ID/00500000-00010.ped
 
 
 #' ## List Elements
 #' list all genotype sets, snp_selection and individual_selection in the database
 #+ list-all-elements
+log_msg $SCRIPT " * List genotype sets ..."
 snppit -T $DEMODB -R genotype_set
 
 
