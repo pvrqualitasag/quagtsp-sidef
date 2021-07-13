@@ -63,7 +63,7 @@ PGDATADIR=${TSPWORKDIR}/pgdata
 PGLOGDIR=${TSPWORKDIR}/pglog
 PGLOGFILE=$PGLOGDIR/`date +"%Y%m%d%H%M%S"`_postgres.log
 PGDATATRG=/qualstorzws01/data_archiv/tsp/pgdata  #PGDATATRG='' # 
-PG_PORT='5433'
+PG_PORT=5433
 
 #' ## Functions
 #' The following definitions of general purpose functions are local to this script.
@@ -279,7 +279,10 @@ get_pg_port () {
 #+ set-pg-port-fun
 set_pg_port () {
   # determine the pg-port from the global configuration
-  get_pg_port
+  if [ "$PG_PORT" == '' ]
+  then
+    get_pg_port
+  fi  
   # Set the same port in the local configuration
   LOCALCONF=$PGDATADIR/postgresql.conf
   # keep old version
