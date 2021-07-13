@@ -63,7 +63,7 @@ PGDATADIR=${TSPWORKDIR}/pgdata
 PGLOGDIR=${TSPWORKDIR}/pglog
 PGLOGFILE=$PGLOGDIR/`date +"%Y%m%d%H%M%S"`_postgres.log
 PGDATATRG=/qualstorzws01/data_archiv/tsp/pgdata  #PGDATATRG='' # 
-PG_PORT=5433
+PG_PORT='' #5433
 
 #' ## Functions
 #' The following definitions of general purpose functions are local to this script.
