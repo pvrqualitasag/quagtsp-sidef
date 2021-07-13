@@ -62,7 +62,8 @@ TSPWORKDIR=/home/zws/tsp
 PGDATADIR=${TSPWORKDIR}/pgdata
 PGLOGDIR=${TSPWORKDIR}/pglog
 PGLOGFILE=$PGLOGDIR/`date +"%Y%m%d%H%M%S"`_postgres.log
-PGDATATRG=/qualstorzws01/data_tmp/tsp/pgdata  #PGDATATRG='' # 
+# PGDATATRG=/qualstorzws01/data_tmp/tsp/pgdata  #PGDATATRG='' # 
+PGDATATRG=/qualstorzws01/data_archiv/tsp/pgdata  #PGDATATRG='' # 
 # PGLOGTRG=/qualstorzws01/data_tmp/tsp/pglog  #PGLOGTRG=''  # 
 PG_PORT=''
 
