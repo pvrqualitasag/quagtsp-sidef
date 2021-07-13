@@ -1,0 +1,102 @@
+---
+title: "TSP Backup Via NetApp Snapshots"
+author: "Peter von Rohr"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Disclaimer
+Tests and experiments with data backup and restore with the NetApp Snapshot functionality are documented.
+
+
+
+# Test
+Run the first few commands from '/usr/local/TheSNPpit_current/bin/demo.bat' and check whether the data persists. The data import commands are included in the script 'import_demo_data.sh'. The script is started from inside sitsp with 
+
+```
+zws@niesen:~$ ./simg/quagtsp-sidef/bash/import_demo_data.sh
+```
+
+The content of the imported data can be checked with 
+
+```
+snppit -T TheSNPpit_demo_zws -R genotype_set
+
+#                                          List of Genotype Sets
+#
+#SetName|IndSel|SNPSel|  Panel   |     Timestamp     |                       Comment
+#-------|------|------|----------|-------------------|-----------------------------------------------------
+#gs_001 |is_001|ss_001|chk-57Illu|2021-07-13 11:26:04|[Full SNP selectionIDs only from picken.ped]
+#gs_002 |is_002|ss_002|  500000  |2021-07-13 11:26:26|[Full SNP selectionIDs only from 00500000-00010.ped]
+```
+
+
+# Empty Test Database
+As soon as a snapshot was created, then we can create an empty test database.
+
+
+```
+zws@niesen:~$ ./simg/quagtsp-sidef/bash/create_empty_tsp_db.sh 
+```
+
+Check content of previously selected elements
+
+```
+zws@niesen:~$ snppit -T TheSNPpit_demo_zws -R genotype_set
+#
+#            List of Genotype Sets
+#
+#SetName|IndSel|SNPSel|Panel|Timestamp|Comment
+#-------|------|------|-----|---------|-------
+#
+```
+
+
+# Restore
+The first step when restoring is to stop the database. This is done in sitsp with
+
+```
+zws@niesen:~$ ./simg/quagtsp-sidef/bash/pg_stop.sh 
+```
+
+Then the old version of the database can be restored from the snapshot
+
+```
+cd /qualstorzws01/data_archiv/tsp/pgdata
+rm -rf *
+cp -p -r /qualstorzws01/data_archiv/.snapshot/every1hours_7_to_7.2021-07-13_1305/tsp/pgdata/* .
+```
+
+Starting the database
+
+```
+zws@niesen:~$ ./simg/quagtsp-sidef/bash/pg_start.sh 
+/usr/lib/postgresql/10/bin/pg_isready
+#/var/run/postgresql:5432 - accepting connections
+```
+
+
+# Check
+Check the content of the Test-Database
+
+```
+zws@niesen:~$ snppit -T TheSNPpit_demo_zws -R genotype_set
+#
+#                                          List of Genotype Sets
+#
+#SetName|IndSel|SNPSel|  Panel   |     Timestamp     |                       Comment
+#-------|------|------|----------|-------------------|-----------------------------------------------------
+#gs_001 |is_001|ss_001|chk-57Illu|2021-07-13 11:26:04|[Full SNP selectionIDs only from picken.ped]
+#gs_002 |is_002|ss_002|  500000  |2021-07-13 11:26:26|[Full SNP selectionIDs only from 00500000-00010.ped]
+```
+
+Somit scheint die Datensicherung über die NetApp-Snapshots grundsätzlich zu funktionieren.
+
+
+
+
+
