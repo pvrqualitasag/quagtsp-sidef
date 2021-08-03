@@ -1,0 +1,146 @@
+---
+title: TSP Usage Documentation
+author: Peter von Rohr
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Disclaimer 
+Documentation of usage of TSP.
+
+
+# Examples
+The following examples of possible usage cases are taken from `/usr/local/TheSNPpit_current/bin/demo.bat`. In this demo-script a test database is created and different data files are imported. The commands in this demo script are followed to find out about and to test for different functionalities.
+
+
+# Databases
+First, we want to find out which databases are available to be used by TSP.
+
+```
+psql -l --tuples-only --quiet --no-align --field-separator=' '|awk '{print $1}'
+# ==> TheSNPpit
+# ==> TheSNPpit_test
+# ==> postgres
+# ==> template0
+# ==> zws=CTc/zws
+# ==> template1
+# ==> zws=CTc/zws
+```
+
+
+A new demo database can be constructed by the following commands
+
+```
+# variable settings
+ADMINUSER=$USER
+DEMODB=TheSNPpit_demo_$USER
+SNP_HOME=${SNP_HOME-/usr/local/TheSNPpit_current}
+SNP_LIB=${SNP_HOME}/lib
+DB_ENCODING=utf8
+# db creation
+echo " * Creating TheSNPpit Demo Database: $DEMODB ..."
+createdb --encoding=$DB_ENCODING --owner=$ADMINUSER --no-password $DEMODB
+# check
+psql -l --tuples-only --quiet --no-align --field-separator=' '|awk '{print $1}' | grep "^${DEMODB}$"
+# ==> TheSNPpit_demo_zws
+```
+
+Fill the created Demo-DB with the required structure defined in TheSNPpit.sql
+
+```
+psql -q -f ${SNP_LIB}/TheSNPpit.sql $DEMODB -U $ADMINUSER
+```
+
+
+# Panel Map Import
+The following command seams to import a panel map from the file picken.map in 'ped' format using the panel-import feature. The imported panel gets the name 'chk-57Illu' and can later be referred to by using this name.
+
+```
+ID="$SNP_HOME/regression/input"
+snppit  -T $DEMODB -I panel -f ped -p chk-57Illu -i $ID/picken.map --skipheader
+```
+
+
+# Data Import
+Data for the created panel can be imported with the following command
+
+```
+snppit -T $DEMODB -I data  -f ped -p chk-57Illu -i $ID/picken.ped
+```
+
+
+# Import of a second set of data
+First the panel map
+
+```
+snppit -T $DEMODB -I panel -f ped -p 500000 -i $ID/00500000-00010.map
+```
+
+then the data
+
+```
+snppit -T $DEMODB -I data -f ped -p 500000 -i $ID/00500000-00010.ped
+```
+
+
+# Query Functionality
+List all genotype sets, snp_selection and individual_selection in the database 
+
+```
+snppit -T $DEMODB -R genotype_set
+```
+
+List all snp selections
+
+```
+snppit -T $DEMODB -R snp_selection
+```
+
+Individual selection
+
+```
+snppit -T $DEMODB -R individual_selection
+```
+
+
+## Export 
+
+The following command exports the genotype_set named 'gs_001' and creates the files gs_001.ss_001.is_001.{ped,map} in the current directory.
+
+```
+snppit -T $DEMODB -E genotype_set --name gs_001
+```
+
+The export can also be done in a different format (-f) and to a different filename (-o)
+
+```
+snppit -T $DEMODB -E genotype_set --name gs_001 -f 0125 -o wk0125
+```
+
+
+## Set Creation
+New genotype sets can be created using 
+
+```
+snppit -T $DEMODB -S genotype_set --name gs_001 --maf=.01
+```
+
+This automatically creates a new genotype_set 'gs_003'. With the parameter -S we can specify which genotype_set should be used as starting point.
+
+
+## Selections Based on 'No Calls'
+New selections can also be created on 'no calls'. The following statement filters no-calls for SNP at 0.03 and for individuals at 0.05 with applying the filter first to snp
+
+```
+snppit -T $DEMODB  -S genotype_set --name gs_003 --ncsnp=.03 --ncind=.05 --first='snp'
+```
+
+If the filter should be applied on individuals first, then the parameter --first='ind' must be specified.
+
+
+
+

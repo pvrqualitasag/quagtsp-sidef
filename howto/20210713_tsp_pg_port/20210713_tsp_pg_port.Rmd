@@ -1,0 +1,26 @@
+---
+title: "TSP PG DB Port"
+author: "Peter von Rohr"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Disclaimer
+
+
+# Changes
+In the script post_install_tsp_sa.sh, the port is specified using the variable PG_PORT. 
+
+
+# Tests
+
+
+
+# Pre-Requisites
+According to the Users Guide of TheSNPpit, the port of the PG database is taken from '/etc/postgresql/10/main/postgresql.conf'. This requires to rebuild the singularity container image. This is done on 1-htz
+
+
