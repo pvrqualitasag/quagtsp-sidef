@@ -1,0 +1,96 @@
+---
+title: Clone SNPpit Database
+author: Peter von Rohr
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Disclaimer 
+This document shows experiments on how to clone the SNPpit database.
+
+
+# Resources
+
+
+# Example
+Prepare demo database
+
+```
+2000  psql -l --tuples-only --quiet --no-align --field-separator=' '|awk '{print $1}'
+ 2001  ADMINUSER=$USER
+ 2002  DEMODB=TheSNPpit_demo_$USER
+ 2003  SNP_HOME=${SNP_HOME-/usr/local/TheSNPpit_current}
+ 2004  SNP_LIB=${SNP_HOME}/lib
+ 2005  DB_ENCODING=utf8
+ 2006  # db creation
+ 2007  echo " * Creating TheSNPpit Demo Database: $DEMODB ..."
+ 2008  createdb --encoding=$DB_ENCODING --owner=$ADMINUSER --no-password $DEMODB
+ 2009  psql -l --tuples-only --quiet --no-align --field-separator=' '|awk '{print $1}' | grep "^${DEMODB}$"
+ 2010  psql -q -f ${SNP_LIB}/TheSNPpit.sql $DEMODB -U $ADMINUSER
+ 2011  ID="$SNP_HOME/regression/input"
+ 2012  snppit  -T $DEMODB -I panel -f ped -p chk-57Illu -i $ID/picken.map --skipheader
+ 2013  snppit -T $DEMODB -I data  -f ped -p chk-57Illu -i $ID/picken.ped
+ 2014  snppit -T $DEMODB -I panel -f ped -p 500000 -i $ID/00500000-00010.map
+ 2015  snppit -T $DEMODB -I data -f ped -p 500000 -i $ID/00500000-00010.ped
+ 2016  snppit -T $DEMODB -R genotype_set
+#List of Genotype Sets
+#
+#SetName|IndSel|SNPSel|  Panel   |     Timestamp     |                       Comment
+#-------|------|------|----------|-------------------|-----------------------------------------------------
+#gs_001 |is_001|ss_001|chk-57Illu|2021-08-24 09:54:50|[Full SNP selectionIDs only from picken.ped]
+#gs_002 |is_002|ss_002|  500000  |2021-08-24 09:55:38|[Full SNP selectionIDs only from 00500000-00010.ped]
+```
+
+# Commands
+
+On the postgres documentation page https://www.postgresql.org/docs/10/manage-ag-createdb.html the script `createdb` is used to create a new database. 
+
+```
+CLONEDB=clone_$DEMODB
+createdb --encoding=$DB_ENCODING --owner=$ADMINUSER --no-password --template=$DEMODB $CLONEDB
+psql -l --tuples-only --quiet --no-align --field-separator=' '|awk '{print $1}' | grep "^${CLONEDB}$"
+#clone_TheSNPpit_demo_zws
+```
+
+The question is are the data also in the clone database
+
+```
+snppit -T $CLONEDB -R genotype_set
+#                                          List of Genotype Sets
+#
+#SetName|IndSel|SNPSel|  Panel   |     Timestamp     |                       Comment
+#-------|------|------|----------|-------------------|-----------------------------------------------------
+#gs_001 |is_001|ss_001|chk-57Illu|2021-08-24 09:54:50|[Full SNP selectionIDs only from picken.ped]
+#gs_002 |is_002|ss_002|  500000  |2021-08-24 09:55:38|[Full SNP selectionIDs only from 00500000-00010.ped]
+```
+
+
+
+On https://www.postgresqltutorial.com/postgresql-copy-database/ it is shown how to use the SQL-statement "CREATE DATABASE" to clone an existing database. For our example this would correspond to
+
+
+```
+psql -U $ADMINUSER -c "CREATE DATABASE clone_$DEMODB WITH TEMPLATE $DEMODB"
+```
+
+# Cleaning up
+The cloned database is dropped again
+
+```
+dropdb $CLONEDB
+psql -l --tuples-only --quiet --no-align --field-separator=' '|awk '{print $1}' | grep "^${CLONEDB}$"
+
+```
+
+# More Checks
+Check what has been read into the test database
+
+```
+TESTDB=TheSNPpit_test
+snppit -T $TESTDB -R panel
+```
+

@@ -142,5 +142,10 @@ snppit -T $DEMODB  -S genotype_set --name gs_003 --ncsnp=.03 --ncind=.05 --first
 If the filter should be applied on individuals first, then the parameter --first='ind' must be specified.
 
 
+## Clean Up
+
+```
+dropdb $DEMODB
+```
 
 
