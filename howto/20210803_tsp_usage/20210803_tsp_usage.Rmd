@@ -149,3 +149,32 @@ dropdb $DEMODB
 ```
 
 
+## Wrapper Skript
+
+After running the preparation on niesen in sitsp:
+
+```
+ADMINUSER=$USER
+DEMODB=TheSNPpit_demo_$USER
+SNP_HOME=${SNP_HOME-/usr/local/TheSNPpit_current}
+ID="$SNP_HOME/regression/input"
+# run wrapper version
+sisnppit -T $DEMODB -I panel -f ped -p chk-57Illu -i $ID/picken.map --skipheader
+```
+
+Import
+
+```
+sisnppit -T $DEMODB -I panel -f ped -p 500000 -i $ID/00500000-00010.map
+sisnppit -T $DEMODB -I data -f ped -p 500000 -i $ID/00500000-00010.ped
+```
+
+Show
+
+```
+sisnppit -R genotype_set
+```
+
+Clean up on niesen in sitsp
+
+
