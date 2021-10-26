@@ -203,7 +203,7 @@ shift $((OPTIND-1))  #This tells getopts to move on to the next argument.
 #' ## Define User-dependent Variables
 #' Repository root and repository path depend on the user, hence they are 
 #' specified after commandline parsing
-REPONAME='quagtsp_sidef'
+REPONAME='quagtsp-sidef'
 REPOROOT=/home/${REMOTEUSER}/simg
 REPOPATH=$REPOROOT/$REPONAME
 REPOURL="https://github.com/pvrqualitasag/${REPONAME}.git"
