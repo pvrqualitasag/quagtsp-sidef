@@ -108,6 +108,8 @@ clone_repo () {
   local l_SERVER=$1
   log_msg 'clone_repo' " ** Cloning repo on $l_SERVER ..."
   log_msg 'clone_repo' " ** Repourl: $REPOURL ..."
+  log_msg 'clone_repo' " ** REPOROOT: $REPOROOT ..."
+  log_msg 'clone_repo' " ** REPOPATH: $REPOPATH ..."
   SSHCMD="QSRCDIR=$REPOROOT; 
 QHTZDIR=$REPOPATH;"' 
 if [ ! -d "$QSRCDIR" ];then mkdir -p ${QSRCDIR};fi;'
@@ -204,8 +206,7 @@ shift $((OPTIND-1))  #This tells getopts to move on to the next argument.
 REPONAME='quagtsp_sidef'
 REPOROOT=/home/${REMOTEUSER}/simg
 REPOPATH=$REPOROOT/$REPONAME
-REPOURL=https://github.com/pvrqualitasag/${REPONAME}.git
-
+REPOURL="https://github.com/pvrqualitasag/${REPONAME}.git"
 
 #' ## Run Updates
 #' Decide whether to run the update on one server or on all servers on the list

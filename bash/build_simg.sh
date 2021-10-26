@@ -134,6 +134,7 @@ check_exist_dir_create $SWORKDIR
 ### # change to work directory
 CURRWD=`pwd`
 cd $SWORKDIR
+log_msg $SCRIPT " * Changed working directory to: $SWORKDIR ..."
 
 ### # check whether definition file can still be found after cd
 if [ ! -f "$SIMGDEF" ]
@@ -147,6 +148,8 @@ fi
 ### # create the image file
 SIMGFN=`date +"%Y%m%d%H%M%S"`_${SIMGLABEL}.img
 SIMGLOG=${SIMGFN}.log
+log_msg $SCRIPT " * Img file: $SIMGFN ..."
+log_msg $SCRIPT " * Log file: $SIMGLOG ..."
 
 
 ### # start installation
