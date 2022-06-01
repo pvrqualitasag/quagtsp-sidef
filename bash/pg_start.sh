@@ -192,7 +192,7 @@ LOGFILE=$LOGDIR/`date +"%Y%m%d%H%M%S"`_postgres.log
 
 #' ## Starting the pg-server
 #' The pg-server is started with the pg_ctl command
-#+ pg-server-stop
+#+ pg-server-start
 $PGCTL -D $DATADIR -l $LOGFILE start
 
 
