@@ -63,7 +63,7 @@ PGDATADIR=${TSPWORKDIR}/pgdata
 PGLOGDIR=${TSPWORKDIR}/pglog
 PGLOGFILE=$PGLOGDIR/`date +"%Y%m%d%H%M%S"`_postgres.log
 PGDATATRG=/qualstorzws01/data_archiv/tsp/pgdata  #PGDATATRG='' # 
-PG_PORT='' #5433
+PG_PORT=5433 #5433
 
 #' ## Functions
 #' The following definitions of general purpose functions are local to this script.
@@ -340,8 +340,14 @@ mv_data_item () {
   log_msg mv_data_item " * Move items from data dir to data trg ..."
   for f in "${pglist[@]}";
   do
-    log_msg mv_data_item "   + Moving item $f ..."    
-    mv $f $PGDATATRG
+    if [ -e "$PGDATATRG/$f" ]
+    then
+      log_msg mv_data_item "   + Target $PGDATATRG/$f exists ==> rm $f ..."
+      rm -rf $f
+    else
+      log_msg mv_data_item "   + Moving item $f ..."    
+      mv $f $PGDATATRG
+    fi  
     log_msg mv_data_item "   + Linking $PGDATATRG/$f to $f ..."    
     ln -s $PGDATATRG/$f $f
     sleep 2;
