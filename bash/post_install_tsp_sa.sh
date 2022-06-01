@@ -145,6 +145,27 @@ check_non_empty_dir_fail_create_non_exist () {
   
 }
 
+#' ### Check Directory Existence
+#' The passed directory is created, if it does not exist. If it exists and is 
+#' non-empty the directory is re-named
+#+ check-non-empty-dir-rename-create-non-exist-fun
+check_non_empty_dir_rename_create_non_exist () {
+  local l_check_dir=$1
+  local l_TDATE=$(date +"%Y%m%d%H%M%S")
+  if [ -d $l_check_dir ]
+  then
+    if [ `ls -1 $l_check_dir | wc -l` -gt 0 ]
+    then
+      log_msg check_non_empty_dir_rename_create_non_exist " * Rename $l_check_dir to $l_check_dir.$l_TDATE ..."
+      mv $l_check_dir $l_check_dir.$l_TDATE
+    fi
+  else
+    log_msg check_non_empty_dir_rename_create_non_exist " * Create data directory: $l_check_dir"
+    mkdir -p $l_check_dir
+  fi
+  
+}
+
 #' ### Error and Exit
 #' print errors in red on STDERR and exit
 #+ err-exit
@@ -254,7 +275,7 @@ get_pg_version () {
 #+ init-pg-server-fun
 init_pg_server () {
   # check that data directory does not exist
-  check_non_empty_dir_fail_create_non_exist $PGDATADIR
+  check_non_empty_dir_rename_create_non_exist $PGDATADIR
   # initialise a database for $OSUSER
   log_msg "init_pg_server" " * Init db ..."
   $INITDB -D $PGDATADIR -A trust -U $OSUSER
